@@ -30,7 +30,7 @@ else:
 	device = torch.device('cpu')
 
 # Constant to control how frequently we print train loss
-print_every = 10
+print_every = 2
 
 print('using device:', device)
 
@@ -125,7 +125,7 @@ def train_network():
 									])
 
 	path_data = PathologyDataset(csv_file='microscopy_ground_truth.csv',
-								 root_dir='/Users/admin/desktop/path_pytorch/Part-A_Original', 
+								 root_dir='/workspace/path_data/path_pytorch/Part-A_Original', 
 								 transform=transformation)
 	#root_dir='/workspace/path_data/Part-A_Original'
 	model = nets.TwoLayerFC(input_size=64, hidden_size=512, num_classes=4)
