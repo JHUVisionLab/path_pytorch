@@ -125,7 +125,7 @@ def train_network():
 									])
 
 	path_data = PathologyDataset(csv_file='microscopy_ground_truth.csv',
-								 root_dir='/workspace/path_data/path_pytorch/Part-A_Original', 
+								 root_dir='/workspace/path_data/Part-A_Original', 
 								 transform=transformation)
 	#root_dir='/workspace/path_data/Part-A_Original'
 	model = nets.TwoLayerFC(input_size=64, hidden_size=512, num_classes=4)
