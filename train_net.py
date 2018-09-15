@@ -131,7 +131,7 @@ def train_network(ssh = True):
 	
 	path_data = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, transform=transformation)
 	
-	model = nets.TwoLayerFC(input_size=512, hidden_size=512, num_classes=4)
+	model = nets.TwoLayerFC(input_size=224, hidden_size=512, num_classes=4)
 	optimizer = optim.SGD(model.parameters(), lr=learning_rate)
 	path_data_train, path_data_val = random_split(path_data,[NUM_TRAIN, NUM_VAL])
 
