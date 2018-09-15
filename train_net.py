@@ -36,7 +36,7 @@ print_every = 2
 print('using device:', device)
 
 
-def check_accuracy(loader, model, train, filename):
+def check_accuracy(loader, model, train, filename=None):
 	"""evaluted model and report accuracy
 
 	args:
