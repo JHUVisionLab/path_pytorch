@@ -116,7 +116,7 @@ def train_network(ssh = True):
 	NUM_VAL = 40
 	batch_size = 8
 	learning_rate = 1e-2
-	transformation = transforms.Compose([transforms.Resize([512, 512]),
+	transformation = transforms.Compose([transforms.Resize([224, 224]),
 									 transforms.RandomVerticalFlip(),
 									 transforms.RandomHorizontalFlip(),
 									 transforms.ToTensor(),
