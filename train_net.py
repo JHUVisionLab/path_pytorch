@@ -80,8 +80,8 @@ def train_loop(model, loaders, optimizer, epochs=10):
 	Returns: Nothing, but prints model accuracies during training.
 	"""
 	if torch.cuda.device_count() > 1:
-  		print("Let's use", torch.cuda.device_count(), "GPUs!")
-  		model = nn.DataParallel(model)
+		print("Let's use", torch.cuda.device_count(), "GPUs!")
+		model = nn.DataParallel(model)
 	
 	model = model.to(device=device)  # move the model parameters to CPU/GPU
 	loader_train = loaders['train']
@@ -148,10 +148,10 @@ def train_network(ssh = True):
 	print('final accuracy: ', acc)
 
 	for param in model.parameters():
-    	param.requires_grad = True
-    optimizer = optim.rmsprop(model.parameters(), lr=0.001)
-    acc = train_loop(model, loaders, optimizer, epochs=5)
-    print('final accuracy: ', acc)
+		param.requires_grad = True
+	optimizer = optim.rmsprop(model.parameters(), lr=0.001)
+	acc = train_loop(model, loaders, optimizer, epochs=5)
+	print('final accuracy: ', acc)
 
 
 train_network()
