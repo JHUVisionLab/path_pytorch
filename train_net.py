@@ -84,6 +84,7 @@ def check_accuracy(loader, model, train, filename=None):
 		
 		acc = float(num_correct) / num_samples
 		print('Got %d / %d correct (%.2f)' % (num_correct, num_samples, 100 * acc))
+		print()
 		return acc
 
 
@@ -179,6 +180,7 @@ def train_network(ssh = True):
 	acc = np.zeros((k,))
 	counter = 0
 	for train_idx, test_idx in k_folds(n_splits = k):
+		print('training and evaluating fold ', counter)
 		filename = 'results_' + str(counter) + '.csv'
 		
 		loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
@@ -187,7 +189,7 @@ def train_network(ssh = True):
 		model = nets.resnet50(num_classes)
 		optimizer = optim.RMSprop(model.parameters())
 		loaders = {'train': loader_train, 'val': loader_val}
-		acc[counter] = train_loop(model, loaders, optimizer, epochs=1, filename=filename)
+		acc[counter] = train_loop(model, loaders, optimizer, epochs=800, filename=filename)
 
 		counter+=1
 	
