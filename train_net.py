@@ -33,7 +33,7 @@ else:
 	device = torch.device('cpu')
 
 # Constant to control how frequently we print train loss
-print_every = 4
+print_every = 2
 
 print('using device:', device)
 
@@ -67,7 +67,6 @@ def check_accuracy(loader, model, train, filename=None):
 			num_correct += (preds == y).sum()
 			num_samples += preds.size(0)
 			if not train:
-				pdb.set_trace()
 				p = F.softmax(scores).data.cpu().numpy()
 				c0, c1, c2, c3 = np.split(p, 4, axis = 1)
 				y = y.data.cpu().numpy()
@@ -130,8 +129,9 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None):
 			optimizer.step()
 			if t % print_every == 0 :
 				print('Epoch %d of %d, Iteration %d, loss = %.4f' % (e+1, epochs, t+1, loss.item()))
-				acc = check_accuracy(loader_val, model, train=True)
 				print()
+
+ 		acc = check_accuracy(loader_val, model, train=True)
 
 	acc = check_accuracy(loader_val, model, train=False, filename=filename)
 	return acc
@@ -140,7 +140,7 @@ def train_network(ssh = True):
 	NUM_TRAIN = 360
 	NUM_VAL = 40
 	batch_size = 50
-	learning_rate = 1e-2
+	learning_rate = 1e-3
 	k = 10
 	num_classes = 4
 	transformation_train = transforms.Compose([transforms.RandomChoice([transforms.Resize([224, 224]), 
@@ -187,7 +187,7 @@ def train_network(ssh = True):
 		model = nets.resnet50(num_classes)
 		optimizer = optim.RMSprop(model.parameters())
 		loaders = {'train': loader_train, 'val': loader_val}
-		acc[counter] = train_loop(model, loaders, optimizer, epochs=1, filename=filename)
+		acc[counter] = train_loop(model, loaders, optimizer, epochs=800, filename=filename)
 
 		counter+=1
 	
