@@ -68,7 +68,7 @@ def check_accuracy(loader, model, train, filename=None):
 			num_samples += preds.size(0)
 			if not train:
 				pdb.set_trace()
-				p = nn.Softmax(scores).data.cpu().numpy()
+				p = F.softmax(scores).data.cpu().numpy()
 				c0, c1, c2, c3 = np.split(p, 4, axis = 1)
 				y = y.data.cpu().numpy()
 				preds = preds.data.cpu().numpy()
