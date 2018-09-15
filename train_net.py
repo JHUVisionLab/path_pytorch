@@ -30,7 +30,7 @@ else:
 	device = torch.device('cpu')
 
 # Constant to control how frequently we print train loss
-print_every = 10
+print_every = 2
 
 print('using device:', device)
 
@@ -119,7 +119,7 @@ def train_loop(model, loaders, optimizer, epochs=10):
 def train_network(ssh = True):
 	NUM_TRAIN = 360
 	NUM_VAL = 40
-	batch_size = 8
+	batch_size = 50
 	learning_rate = 1e-2
 	transformation = transforms.Compose([transforms.Resize([224, 224]),
 									 transforms.RandomVerticalFlip(),
