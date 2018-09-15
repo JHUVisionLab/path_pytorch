@@ -131,7 +131,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None):
 				print('Epoch %d of %d, Iteration %d, loss = %.4f' % (e+1, epochs, t+1, loss.item()))
 				print()
 
- 		acc = check_accuracy(loader_val, model, train=True)
+		acc = check_accuracy(loader_val, model, train=True)
 
 	acc = check_accuracy(loader_val, model, train=False, filename=filename)
 	return acc
