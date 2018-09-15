@@ -67,10 +67,11 @@ def check_accuracy(loader, model, train, filename=None):
 			num_correct += (preds == y).sum()
 			num_samples += preds.size(0)
 			if not train:
-				scores = scores.data.cpu().numpy()
+				scores = nn.Softmax(scores).data.cpu().numpy()
+				c0, c1, c2, c3 = np.split(scores, 4, axis = 1)
 				y = y.data.cpu().numpy()
 				preds = preds.data.cpu().numpy()
-				results_dict = {'scores': scores[:,0], 'label': y, 'pred': preds, 'eval': preds == y}
+				results_dict = {'p0': c0, 'p1': c1, 'p2': c2, 'p3': c3, 'label': y, 'pred': preds, 'eval': preds == y}
 				results = pd.DataFrame.from_dict(results_dict)
 				results.to_csv(filename)
 
