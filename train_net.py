@@ -8,6 +8,7 @@ from torch.utils.data import sampler
 from torch.utils.data import random_split
 from torchvision import transforms, utils, models
 from PIL import Image
+from cross_validation import k_folds
 
 
 import pdb
