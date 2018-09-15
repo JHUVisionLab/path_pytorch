@@ -36,7 +36,7 @@ print_every = 2
 print('using device:', device)
 
 
-def check_accuracy(loader, model, train):
+def check_accuracy(loader, model, train, filename):
 	"""evaluted model and report accuracy
 
 	args:
@@ -54,7 +54,7 @@ def check_accuracy(loader, model, train):
 	if train:
 		print('Checking accuracy on validation set')
 	else:
-		print('Checking accuracy on test set')   
+		print('Final Evaluation') 
 
 	with torch.no_grad():
 		for x, y in loader:
@@ -64,12 +64,15 @@ def check_accuracy(loader, model, train):
 			_, preds = scores.max(1)
 			num_correct += (preds == y).sum()
 			num_samples += preds.size(0)
+			if not train:
+				np.savetxt(filename, (scores, preds, y, y == preds))
+		
 		acc = float(num_correct) / num_samples
 		print('Got %d / %d correct (%.2f)' % (num_correct, num_samples, 100 * acc))
 		return acc
 
 
-def train_loop(model, loaders, optimizer, epochs=10):
+def train_loop(model, loaders, optimizer, epochs=10, filename=None):
 	"""
 	Train a model on CIFAR-10 using the PyTorch Module API.
 	
@@ -114,8 +117,8 @@ def train_loop(model, loaders, optimizer, epochs=10):
 				acc = check_accuracy(loader_val, model, train=True)
 				print()
 
-
-	return check_accuracy(loader_val, model, train=True)
+    acc = check_accuracy(loader_val, model, train=False, filename)
+	return acc
 
 def train_network(ssh = True):
 	NUM_TRAIN = 360
@@ -160,13 +163,16 @@ def train_network(ssh = True):
 	acc = np.zeros((k,))
 	counter = 0
 	for train_idx, test_idx in k_folds(n_splits = k):
+		filename = 'results_' + k + '.txt'
+		
 		loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
 		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 40, sampler = sampler.SubsetRandomSampler(test_idx))
 	
 		model = nets.resnet50(num_classes)
 		optimizer = optim.RMSprop(model.parameters())
 		loaders = {'train': loader_train, 'val': loader_val}
-		acc[counter] = train_loop(model, loaders, optimizer, epochs=200)
+		acc[counter] = train_loop(model, loaders, optimizer, epochs=20, filename)
+
 		counter+=1
 	
 	print('k-fold CV accuracy: ', acc)
