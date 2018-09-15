@@ -140,13 +140,13 @@ def train_network(ssh = True):
 
 	loader_val = DataLoader(path_data_val, batch_size=batch_size, shuffle = True)
 	loaders = {'train': loader_train, 'val': loader_val}
-	acc = train_loop(model, loaders, optimizer, epochs=100)
+	acc = train_loop(model, loaders, optimizer, epochs=20)
 	print('final accuracy: ', acc)
 
 	for param in model.parameters():
       param.requires_grad = True
     optimizer = optim.rmsprop(model.parameters(), lr=0.001)
-    acc = train_loop(model, loaders, optimizer, epochs=10)
+    acc = train_loop(model, loaders, optimizer, epochs=5)
 
 
 
