@@ -117,7 +117,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None):
 				acc = check_accuracy(loader_val, model, train=True)
 				print()
 
-	acc = check_accuracy(loader_val, model, train=False, filename)
+	acc = check_accuracy(loader_val, model, train=False, filename=filename)
 	return acc
 
 def train_network(ssh = True):
