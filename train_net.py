@@ -142,7 +142,6 @@ def train_network(ssh = True):
 	acc = np.zeros((k,))
 	counter = 0
 	for train_idx, test_idx in k_folds(n_splits = k):
-		pdb.set_trace()
 		loader_train = torch.utils.data.DataLoader(dataset = path_data, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
 		loader_val = torch.utils.data.DataLoader(dataset = path_data, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(test_idx))
 	
