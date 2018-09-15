@@ -67,7 +67,10 @@ def check_accuracy(loader, model, train, filename=None):
 			if not train:
 				pdb.set_trace()
 				scores = scores.data.cpu().numpy()
-				np.savetxt(filename, (scores, preds, y, y == preds))
+				y = y.data.cpu().numpy()
+				preds = preds.data.cpu().numpy()
+				a = np.hstack(scores, preds, y, y==preds)
+				np.savetxt(filename, a)
 
 		
 		acc = float(num_correct) / num_samples
