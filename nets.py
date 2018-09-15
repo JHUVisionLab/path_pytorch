@@ -53,3 +53,13 @@ class TwoLayerFC(nn.Module):
         x = flatten(x)
         scores = self.fc2(F.relu(self.fc1(x)))
         return scores
+
+def resnet50(num_classes):
+  model = models.resnet50(pretrained=True)
+  num_ftrs = model.fc.in_features
+    #I recommend training with these layers unfrozen for a couple of epochs after the initial frozen training
+  for param in model.parameters():
+      param.requires_grad = False
+  model.fc = torch.nn.Linear(num_ftrs, len(num_classes))
+  return model
+
