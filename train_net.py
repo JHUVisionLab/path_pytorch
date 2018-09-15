@@ -163,7 +163,7 @@ def train_network(ssh = True):
 	acc = np.zeros((k,))
 	counter = 0
 	for train_idx, test_idx in k_folds(n_splits = k):
-		filename = 'results_' + k + '.txt'
+		filename = 'results_' + str(k) + '.txt'
 		
 		loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
 		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 40, sampler = sampler.SubsetRandomSampler(test_idx))
