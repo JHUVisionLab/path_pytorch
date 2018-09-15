@@ -126,7 +126,7 @@ def train_network(ssh = True):
 	num_classes = 4
 	transformation_train = transforms.Compose([transforms.RandomChoice([transforms.Resize([224, 224]), 
 																		transforms.RandomCrop([224, 224]),
-																		transforms.RandomResizedCrop([224, 224])]),
+																		transforms.RandomResizedCrop(224)]),
 											   transforms.RandomApply([transforms.ColorJitter()]),
 											   transforms.RandomVerticalFlip(),
 											   transforms.RandomHorizontalFlip(),
