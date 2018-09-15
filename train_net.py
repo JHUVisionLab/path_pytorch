@@ -72,7 +72,13 @@ def check_accuracy(loader, model, train, filename=None):
 				c0, c1, c2, c3 = np.split(p, 4, axis = 1)
 				y = y.data.cpu().numpy()
 				preds = preds.data.cpu().numpy()
-				results_dict = {'p0': c0, 'p1': c1, 'p2': c2, 'p3': c3, 'label': y, 'pred': preds, 'eval': preds == y}
+				results_dict = {'p0': c0.squeeze(), 
+								'p1': c1.squeeze(), 
+								'p2': c2.squeeze(), 
+								'p3': c3.squeeze(), 
+								'label': y, 
+								'pred': preds, 
+								'eval': preds == y}
 				results = pd.DataFrame.from_dict(results_dict)
 				results.to_csv(filename)
 
