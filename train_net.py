@@ -187,7 +187,7 @@ def train_network(ssh = True):
 		model = nets.resnet50(num_classes)
 		optimizer = optim.RMSprop(model.parameters())
 		loaders = {'train': loader_train, 'val': loader_val}
-		acc[counter] = train_loop(model, loaders, optimizer, epochs=800, filename=filename)
+		acc[counter] = train_loop(model, loaders, optimizer, epochs=1, filename=filename)
 
 		counter+=1
 	
