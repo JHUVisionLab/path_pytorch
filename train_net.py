@@ -30,7 +30,7 @@ else:
 	device = torch.device('cpu')
 
 # Constant to control how frequently we print train loss
-print_every = 2
+print_every = 5
 
 print('using device:', device)
 
@@ -111,24 +111,27 @@ def train_loop(model, loaders, optimizer, epochs=10):
 
 	return check_accuracy(loader_val, model, train=True)
 
-def train_network():
+def train_network(ssh = True):
 	NUM_TRAIN = 360
 	NUM_VAL = 40
 	batch_size = 32
 	learning_rate = 1e-2
-	transformation = transforms.Compose([transforms.Resize([64, 64]),
+	transformation = transforms.Compose([transforms.Resize([512, 512]),
 									 transforms.RandomVerticalFlip(),
 									 transforms.RandomHorizontalFlip(),
 									 transforms.ToTensor(),
 									 transforms.Normalize(mean=[0.485, 0.456, 0.406],
 														  std=[0.229, 0.224, 0.225])
 									])
+	if ssh:
+		root_dir='/workspace/path_data/Part-A_Original'
+	else:
+		root_dir='/Users/admin/desktop/path_pytorch/Part-A_Original'
 
-	path_data = PathologyDataset(csv_file='microscopy_ground_truth.csv',
-								 root_dir='/workspace/path_data/Part-A_Original', 
-								 transform=transformation)
-	#root_dir='/workspace/path_data/Part-A_Original'
-	model = nets.TwoLayerFC(input_size=64, hidden_size=512, num_classes=4)
+	
+	path_data = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, transform=transformation)
+	
+	model = nets.TwoLayerFC(input_size=512, hidden_size=512, num_classes=4)
 	optimizer = optim.SGD(model.parameters(), lr=learning_rate)
 	path_data_train, path_data_val = random_split(path_data,[NUM_TRAIN, NUM_VAL])
 
@@ -136,7 +139,7 @@ def train_network():
 
 	loader_val = DataLoader(path_data_val, batch_size=batch_size, shuffle = True)
 	loaders = {'train': loader_train, 'val': loader_val}
-	acc = train_loop(model, loaders, optimizer, epochs=10)
+	acc = train_loop(model, loaders, optimizer, epochs=15)
 	print('final accuracy: ', acc)
 
 train_network()
