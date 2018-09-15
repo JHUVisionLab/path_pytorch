@@ -109,7 +109,7 @@ def train_loop(model, loaders, optimizer, epochs=10):
 			# computed by the backwards pass.
 			optimizer.step()
 			if t % print_every == 0 :
-				print('Epoch %d, Iteration %d, loss = %.4f' % (e+1, t+1, loss.item()))
+				print('Epoch %d of %d, Iteration %d, loss = %.4f' % (e+1, epochs, t+1, loss.item()))
 				acc = check_accuracy(loader_val, model, train=True)
 				print()
 
@@ -120,14 +120,15 @@ def train_network(ssh = True):
 	NUM_TRAIN = 360
 	NUM_VAL = 40
 	batch_size = 50
-	learning_rate = 1e-2
-	transformation = transforms.Compose([transforms.Resize([224, 224]),
-									 transforms.RandomVerticalFlip(),
-									 transforms.RandomHorizontalFlip(),
-									 transforms.ToTensor(),
-									 transforms.Normalize(mean=[0.485, 0.456, 0.406],
-														  std=[0.229, 0.224, 0.225])
-									])
+	learning_rate = 5e-2
+	transformation = transforms.Compose([transforms.RandomApply([transforms.ColorJitter()]),
+										transforms.Resize([512, 512]),
+									 	transforms.RandomVerticalFlip(),
+									 	transforms.RandomHorizontalFlip(),
+									 	transforms.ToTensor(),
+									 	transforms.Normalize(mean=[0.485, 0.456, 0.406],
+														  	std=[0.229, 0.224, 0.225])
+										])
 	if ssh:
 		root_dir='/workspace/path_data/Part-A_Original'
 	else:
@@ -144,14 +145,7 @@ def train_network(ssh = True):
 
 	loader_val = DataLoader(path_data_val, batch_size=batch_size, shuffle = True)
 	loaders = {'train': loader_train, 'val': loader_val}
-	acc = train_loop(model, loaders, optimizer, epochs=20)
+	acc = train_loop(model, loaders, optimizer, epochs=30)
 	print('final accuracy: ', acc)
-
-	for param in model.parameters():
-		param.requires_grad = True
-	optimizer = optim.RMSprop(model.parameters(), lr=0.001)
-	acc = train_loop(model, loaders, optimizer, epochs=5)
-	print('final accuracy: ', acc)
-
 
 train_network()
