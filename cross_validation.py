@@ -32,7 +32,7 @@ def get_indices(n_splits = 10, samples = 400):
         current = stop
         yield(indices[int(start):int(stop)])
 
-def k_folds(n_splits = 10, subjects = 400):
+def k_folds(n_splits = 10, samples = 400):
     '''
     Generates folds for cross validation
     Args:
