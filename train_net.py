@@ -124,7 +124,7 @@ def train_network(ssh = True):
 	learning_rate = 5e-2
 	k = 10
 	num_classes = 4
-	transformation = transforms.Compose([transforms.RandomApply([transforms.ColorJitter()]),
+	transformation_train = transforms.Compose([transforms.RandomApply([transforms.ColorJitter()]),
 										transforms.Resize([224, 224]),
 										transforms.RandomVerticalFlip(),
 										transforms.RandomHorizontalFlip(),
@@ -132,29 +132,42 @@ def train_network(ssh = True):
 										transforms.Normalize(mean=[0.485, 0.456, 0.406],
 															std=[0.229, 0.224, 0.225])
 										])
+
+	transformation_val = transforms.Compose([transforms.Resize([224, 224]),
+											 transforms.ToTensor(),
+											 transforms.Normalize(mean=[0.485, 0.456, 0.406],
+															std=[0.229, 0.224, 0.225])
+											])
 	if ssh:
 		root_dir='/workspace/path_data/Part-A_Original'
 	else:
 		root_dir='/Users/admin/desktop/path_pytorch/Part-A_Original'
 
-	
-	path_data = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, transform=transformation)
+	# path_data_train and path_data_val should have different transformation (path_data_val should not apply data augmentation)
+	# therefore we shuffle path_data_train and copy its shuffled image ids and corresponding labels over to path_data_val
+	path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = True, transform=transformation_train)
+	path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = False, transform=transformation_val)
+
+	path_data_val.img_ids = path_data_train.img_ids.copy()
+	path_data_val.img_labels = path_data_train.img_labels.copy()
+
+	# make sure the two datasets are identical in ids and labels
+	assert np.all(np.equal(path_data_val.img_ids, path_data_train.img_ids))
+	assert np.all(np.equal(path_data_val.img_labels, path_data_train.img_labels))
+
 	acc = np.zeros((k,))
 	counter = 0
 	for train_idx, test_idx in k_folds(n_splits = k):
-		loader_train = torch.utils.data.DataLoader(dataset = path_data, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
-		loader_val = torch.utils.data.DataLoader(dataset = path_data, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(test_idx))
+		loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
+		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 40, sampler = sampler.SubsetRandomSampler(test_idx))
 	
 		model = nets.resnet50(num_classes)
-		#model = nets.TwoLayerFC(input_size=224, hidden_size=512, num_classes=4)
 		optimizer = optim.RMSprop(model.parameters())
-		#path_data_train, path_data_val = random_split(path_data,[NUM_TRAIN, NUM_VAL])
-		# loader_train = DataLoader(path_data_train,batch_size=batch_size, shuffle = True)
-		# loader_val = DataLoader(path_data_val, batch_size=batch_size, shuffle = True)
 		loaders = {'train': loader_train, 'val': loader_val}
 		acc[counter] = train_loop(model, loaders, optimizer, epochs=40)
 		counter+=1
 	
-	print('final accuracy: ', np.mean(acc))
+	print('k-fold CV accuracy: ', acc)
+	print('final mean accuracy: ', np.mean(acc))
 
 train_network()
