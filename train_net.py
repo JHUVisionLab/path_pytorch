@@ -10,6 +10,8 @@ from torchvision import transforms, utils, models
 from PIL import Image
 from cross_validation import k_folds
 
+import pandas as pd
+
 
 import pdb
 
@@ -31,7 +33,7 @@ else:
 	device = torch.device('cpu')
 
 # Constant to control how frequently we print train loss
-print_every = 2
+print_every = 4
 
 print('using device:', device)
 
@@ -68,8 +70,9 @@ def check_accuracy(loader, model, train, filename=None):
 				scores = scores.data.cpu().numpy()
 				y = y.data.cpu().numpy()
 				preds = preds.data.cpu().numpy()
-				a = np.array(list(zip(scores, preds, y, y==preds)))
-				np.savetxt(filename, a)
+				results_dict = {'scores': scores[:,0], 'label': y, 'pred': preds, 'eval': preds == y}
+				results = pd.DataFrame.from_dict(results_dict)
+				results.to_csv(filename)
 
 		
 		acc = float(num_correct) / num_samples
