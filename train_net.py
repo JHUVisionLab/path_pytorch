@@ -123,11 +123,11 @@ def train_network(ssh = True):
 	learning_rate = 5e-2
 	transformation = transforms.Compose([transforms.RandomApply([transforms.ColorJitter()]),
 										transforms.Resize([224, 224]),
-									 	transforms.RandomVerticalFlip(),
-									 	transforms.RandomHorizontalFlip(),
-									 	transforms.ToTensor(),
-									 	transforms.Normalize(mean=[0.485, 0.456, 0.406],
-														  	std=[0.229, 0.224, 0.225])
+										transforms.RandomVerticalFlip(),
+										transforms.RandomHorizontalFlip(),
+										transforms.ToTensor(),
+										transforms.Normalize(mean=[0.485, 0.456, 0.406],
+															std=[0.229, 0.224, 0.225])
 										])
 	if ssh:
 		root_dir='/workspace/path_data/Part-A_Original'
@@ -141,9 +141,9 @@ def train_network(ssh = True):
 
 	for train_idx, test_idx in k_folds(n_splits = 10):
 		pdb.set_trace()
-	    loader_train = torch.utils.data.DataLoader(dataset = path_data, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
-	    loader_val = torch.utils.data.DataLoader(dataset = path_data, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(test_idx))
-    
+		loader_train = torch.utils.data.DataLoader(dataset = path_data, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
+		loader_val = torch.utils.data.DataLoader(dataset = path_data, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(test_idx))
+	
 		model = nets.resnet50(4)
 		#model = nets.TwoLayerFC(input_size=224, hidden_size=512, num_classes=4)
 		optimizer = optim.RMSprop(model.parameters())
