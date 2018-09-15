@@ -1,4 +1,5 @@
 import numpy as np
+import pdb
 
 # Developer: Alejandro Debus
 # Email: aledebus@gmail.com
@@ -44,3 +45,15 @@ def k_folds(n_splits = 10, samples = 400):
     for test_idx in get_indices(n_splits, samples):
         train_idx = np.setdiff1d(indices, test_idx)
         yield train_idx, test_idx
+
+def test_kfold(k = 10, samples = 400):
+    for train_idx, test_idx in k_folds(n_splits = 10, samples = samples):
+        assert np.unique(train_idx).size == samples/k*(k-1)
+        assert np.unique(test_idx).size == samples/k
+        train_idx = set(train_idx)
+        test_idx = set(test_idx)
+        s = list(train_idx.intersection(test_idx))
+        assert s == []
+
+test_kfold()
+
