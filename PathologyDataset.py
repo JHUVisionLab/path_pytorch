@@ -22,7 +22,7 @@ import torch.nn.functional as F  # useful stateless functions
 import nets 
 class PathologyDataset(Dataset):
     """Pathology dataset"""
-    def __init__(self, root_dir, csv_file = 'microscopy_ground_truth.csv', transform=transforms.ToTensor(), shuffle = False):
+    def __init__(self, root_dir, csv_file = 'microscopy_ground_truth.csv', transform=transforms.ToTensor(), shuffle = True):
         """
         Args:
             csv_file (string): Path to the csv file with annotations.

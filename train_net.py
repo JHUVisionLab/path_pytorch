@@ -109,6 +109,7 @@ def train_loop(model, loaders, optimizer, epochs=10):
 				acc = check_accuracy(loader_val, model, train=True)
 				print()
 
+
 	return check_accuracy(loader_val, model, train=True)
 
 def train_network(ssh = True):
@@ -132,14 +133,21 @@ def train_network(ssh = True):
 	path_data = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, transform=transformation)
 	model = nets.resnet50(4)
 	#model = nets.TwoLayerFC(input_size=224, hidden_size=512, num_classes=4)
-	optimizer = optim.SGD(model.parameters(), lr=learning_rate)
+	optimizer = optim.rmsprop(model.parameters())
 	path_data_train, path_data_val = random_split(path_data,[NUM_TRAIN, NUM_VAL])
 
 	loader_train = DataLoader(path_data_train,batch_size=batch_size, shuffle = True)
 
 	loader_val = DataLoader(path_data_val, batch_size=batch_size, shuffle = True)
 	loaders = {'train': loader_train, 'val': loader_val}
-	acc = train_loop(model, loaders, optimizer, epochs=15)
+	acc = train_loop(model, loaders, optimizer, epochs=100)
 	print('final accuracy: ', acc)
+
+	for param in model.parameters():
+      param.requires_grad = True
+    optimizer = optim.rmsprop(model.parameters(), lr=0.001)
+    acc = train_loop(model, loaders, optimizer, epochs=10)
+
+
 
 train_network()
