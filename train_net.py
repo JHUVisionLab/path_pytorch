@@ -136,16 +136,24 @@ def train_network(ssh = True):
 
 	
 	path_data = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, transform=transformation)
-	model = nets.resnet50(4)
-	#model = nets.TwoLayerFC(input_size=224, hidden_size=512, num_classes=4)
-	optimizer = optim.RMSprop(model.parameters())
-	path_data_train, path_data_val = random_split(path_data,[NUM_TRAIN, NUM_VAL])
+	acc = np.zeros((10,))
+	counter = 0
+	for train_idx, test_idx in k_folds(n_splits = 10):
+	    loader_train = torch.utils.data.DataLoader(dataset = path_data, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
+	    loader_val = torch.utils.data.DataLoader(dataset = path_data, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(test_idx))
+    
+		model = nets.resnet50(4)
+		#model = nets.TwoLayerFC(input_size=224, hidden_size=512, num_classes=4)
+		optimizer = optim.RMSprop(model.parameters())
+		path_data_train, path_data_val = random_split(path_data,[NUM_TRAIN, NUM_VAL])
 
-	loader_train = DataLoader(path_data_train,batch_size=batch_size, shuffle = True)
+		# loader_train = DataLoader(path_data_train,batch_size=batch_size, shuffle = True)
 
-	loader_val = DataLoader(path_data_val, batch_size=batch_size, shuffle = True)
-	loaders = {'train': loader_train, 'val': loader_val}
-	acc = train_loop(model, loaders, optimizer, epochs=30)
-	print('final accuracy: ', acc)
+		# loader_val = DataLoader(path_data_val, batch_size=batch_size, shuffle = True)
+		loaders = {'train': loader_train, 'val': loader_val}
+		acc[i] = train_loop(model, loaders, optimizer, epochs=30)
+		counter+=1
+	
+	print('final accuracy: ', np.mean(acc))
 
 train_network()
