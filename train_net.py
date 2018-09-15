@@ -80,7 +80,7 @@ def check_accuracy(loader, model, train, filename=None):
 								'pred': preds, 
 								'eval': preds == y}
 				results = pd.DataFrame.from_dict(results_dict)
-				results.to_csv(filename)
+				results.to_csv(filename, index = False)
 
 		
 		acc = float(num_correct) / num_samples
