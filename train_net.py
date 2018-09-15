@@ -65,6 +65,7 @@ def check_accuracy(loader, model, train, filename=None):
 			num_correct += (preds == y).sum()
 			num_samples += preds.size(0)
 			if not train:
+				pdb.set_trace()
 				scores = scores.data.cpu().numpy()
 				np.savetxt(filename, (scores, preds, y, y == preds))
 
@@ -173,7 +174,7 @@ def train_network(ssh = True):
 		model = nets.resnet50(num_classes)
 		optimizer = optim.RMSprop(model.parameters())
 		loaders = {'train': loader_train, 'val': loader_val}
-		acc[counter] = train_loop(model, loaders, optimizer, epochs=2, filename=filename)
+		acc[counter] = train_loop(model, loaders, optimizer, epochs=1, filename=filename)
 
 		counter+=1
 	
