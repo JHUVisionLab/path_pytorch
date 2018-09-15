@@ -79,6 +79,10 @@ def train_loop(model, loaders, optimizer, epochs=10):
 	
 	Returns: Nothing, but prints model accuracies during training.
 	"""
+	if torch.cuda.device_count() > 1:
+  		print("Let's use", torch.cuda.device_count(), "GPUs!")
+  		model = nn.DataParallel(model)
+	
 	model = model.to(device=device)  # move the model parameters to CPU/GPU
 	loader_train = loaders['train']
 	loader_val = loaders['val']
