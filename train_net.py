@@ -121,17 +121,19 @@ def train_network(ssh = True):
 	NUM_TRAIN = 360
 	NUM_VAL = 40
 	batch_size = 50
-	learning_rate = 5e-2
+	learning_rate = 1e-2
 	k = 10
 	num_classes = 4
-	transformation_train = transforms.Compose([transforms.RandomApply([transforms.ColorJitter()]),
-										transforms.Resize([224, 224]),
-										transforms.RandomVerticalFlip(),
-										transforms.RandomHorizontalFlip(),
-										transforms.ToTensor(),
-										transforms.Normalize(mean=[0.485, 0.456, 0.406],
+	transformation_train = transforms.Compose([transforms.RandomChoice([transforms.Resize([224, 224]), 
+																		transforms.RandomCrop([224, 224]),
+																		transforms.RandomResizedCrop([224, 224])]),
+											   transforms.RandomApply([transforms.ColorJitter()]),
+											   transforms.RandomVerticalFlip(),
+											   transforms.RandomHorizontalFlip(),
+											   transforms.ToTensor(),
+										       transforms.Normalize(mean=[0.485, 0.456, 0.406],
 															std=[0.229, 0.224, 0.225])
-										])
+										       ])
 
 	transformation_val = transforms.Compose([transforms.Resize([224, 224]),
 											 transforms.ToTensor(),
@@ -164,7 +166,7 @@ def train_network(ssh = True):
 		model = nets.resnet50(num_classes)
 		optimizer = optim.RMSprop(model.parameters())
 		loaders = {'train': loader_train, 'val': loader_val}
-		acc[counter] = train_loop(model, loaders, optimizer, epochs=40)
+		acc[counter] = train_loop(model, loaders, optimizer, epochs=200)
 		counter+=1
 	
 	print('k-fold CV accuracy: ', acc)

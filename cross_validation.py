@@ -54,8 +54,6 @@ def test_kfold(k = 10, samples = 400):
         test_idx = set(test_idx)
         s = list(train_idx.intersection(test_idx))
         assert s == []
-        print(train_idx)
-        print(test_idx)
 
-test_kfold()
+#test_kfold()
 
