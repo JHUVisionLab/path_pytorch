@@ -22,7 +22,7 @@ def get_indices(n_splits = 10, samples = 400):
         subjects: number of patients
         frames: length of the sequence of each patient
     '''
-    l = partitions(subjects, n_splits)
+    l = partitions(samples, n_splits)
     fold_sizes = l 
     indices = np.arange(samples).astype(int)
     current = 0
