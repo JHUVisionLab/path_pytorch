@@ -58,7 +58,8 @@ def resnet50_train(num_classes):
   model = resnet50(pretrained=True, num_classes = 4)
   for param in model.parameters():
       param.requires_grad = False
+  pdb.set_trace()
   model.fc1.requires_grad = True
-  model.fc2.requires_grade = True
+  model.fc2.requires_grad = True
   return model
 
