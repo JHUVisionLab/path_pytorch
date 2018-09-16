@@ -189,7 +189,7 @@ def train_network(ssh = True):
 	filename = 'results'  + '.csv'
 		
 	loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, shuffle = True)
-	loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 40)
+	loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 40, shuffle = True)
 	
 	model = nets.resnet50_train(num_classes)
 	print(model)
@@ -197,7 +197,7 @@ def train_network(ssh = True):
 	for name, p in model.named_parameters():
 		print(name, p.requires_grad)
 
-	optimizer = optim.RMSprop(filter(lambda p: p.requires_grad, model.parameters()))
+	optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()))
 	loaders = {'train': loader_train, 'val': loader_val}
 	acc = train_loop(model, loaders, optimizer, epochs=100, filename=filename)
 

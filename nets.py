@@ -7,7 +7,7 @@ from torch.utils.data import Dataset, DataLoader
 from torch.utils.data import sampler
 from torch.utils.data import random_split
 from torchvision import transforms, utils, models
-from resnet import resnet50
+from resnet import resnet50_fc
 
 import pdb
 
@@ -54,8 +54,18 @@ class TwoLayerFC(nn.Module):
         scores = self.fc2(F.relu(self.fc1(x)))
         return scores
 
+def resnet50(num_classes):
+  model = models.resnet50(pretrained=True)
+  num_ftrs = model.fc.in_features
+    #I recommend training with these layers unfrozen for a couple of epochs after the initial frozen training
+  for param in model.parameters():
+      param.requires_grad = False
+  model.fc = torch.nn.Linear(num_ftrs, len(num_classes))
+  return model
+
+
 def resnet50_train(num_classes):
-  model = resnet50(pretrained=True, num_classes = 4)
+  model = resnet50_fc(pretrained=True, num_classes = 4)
   for param in model.parameters():
       param.requires_grad = False
   pdb.set_trace()
@@ -64,4 +74,3 @@ def resnet50_train(num_classes):
   model.fc2.weight.requires_grad = True
   model.fc2.bias.requires_grad = True
   return model
-
