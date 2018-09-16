@@ -55,11 +55,10 @@ class TwoLayerFC(nn.Module):
         return scores
 
 def resnet50_train(num_classes):
-  model = resnet50(pretrained=True)
-  num_ftrs = model.fc.in_features
-    #I recommend training with these layers unfrozen for a couple of epochs after the initial frozen training
+  model = resnet50(pretrained=True, num_classes = 4)
   for param in model.parameters():
       param.requires_grad = False
-  model.fc = torch.nn.Linear(num_ftrs, num_classes)
+  model.fc1.requires_grad = True
+  model.fc2.requires_grade = True
   return model
 
