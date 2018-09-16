@@ -7,7 +7,7 @@ from torch.utils.data import Dataset, DataLoader
 from torch.utils.data import sampler
 from torch.utils.data import random_split
 from torchvision import transforms, utils, models
-
+import resnet.resnet50 as resnet50
 
 import pdb
 
@@ -55,7 +55,7 @@ class TwoLayerFC(nn.Module):
         return scores
 
 def resnet50(num_classes):
-  model = models.resnet50(pretrained=True)
+  model = resnet50(pretrained=True)
   num_ftrs = model.fc.in_features
     #I recommend training with these layers unfrozen for a couple of epochs after the initial frozen training
   for param in model.parameters():
