@@ -59,7 +59,9 @@ def resnet50_train(num_classes):
   for param in model.parameters():
       param.requires_grad = False
   pdb.set_trace()
-  model.fc1.requires_grad = True
-  model.fc2.requires_grad = True
+  model.fc1.weight.requires_grad = True
+  model.fc1.bias.requires_grad = True
+  model.fc2.weight.requires_grad = True
+  model.fc2.bias.requires_grad = True
   return model
 
