@@ -54,7 +54,7 @@ class TwoLayerFC(nn.Module):
         scores = self.fc2(F.relu(self.fc1(x)))
         return scores
 
-def resnet50(num_classes):
+def resnet50_train(num_classes):
   model = resnet50(pretrained=True)
   num_ftrs = model.fc.in_features
     #I recommend training with these layers unfrozen for a couple of epochs after the initial frozen training

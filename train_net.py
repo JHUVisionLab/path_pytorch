@@ -194,7 +194,7 @@ def train_network(ssh = True):
 		loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
 		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 40, sampler = sampler.SubsetRandomSampler(test_idx))
 	
-		model = nets.resnet50(num_classes)
+		model = nets.resnet50_train(num_classes)
 
 		for name, p in model.named_parameters():
 			print(name, p.requires_grad)
