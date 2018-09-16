@@ -144,9 +144,17 @@ def train_network(ssh = True):
 	learning_rate = 1e-3
 	k = 10
 	num_classes = 4
-	transformation_train = transforms.Compose([transforms.RandomChoice([transforms.Resize([224, 224]), 
-																		transforms.RandomCrop([224, 224]),
-																		transforms.RandomResizedCrop(224)]),
+	# transformation_train = transforms.Compose([transforms.RandomChoice([transforms.Resize([224, 224]), 
+	# 																	transforms.RandomCrop([224, 224]),
+	# 																	transforms.RandomResizedCrop(224)]),
+	# 										   # transforms.RandomApply([transforms.ColorJitter()]),
+	# 										   transforms.RandomVerticalFlip(),
+	# 										   transforms.RandomHorizontalFlip(),
+	# 										   transforms.ToTensor(),
+	# 										   transforms.Normalize(mean=[0.485, 0.456, 0.406],
+	# 														std=[0.229, 0.224, 0.225])
+	# 										   ])
+	transformation_train = transforms.Compose([transforms.RandomCrop([224, 224]),
 											   # transforms.RandomApply([transforms.ColorJitter()]),
 											   transforms.RandomVerticalFlip(),
 											   transforms.RandomHorizontalFlip(),
@@ -187,7 +195,7 @@ def train_network(ssh = True):
 		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 40, sampler = sampler.SubsetRandomSampler(test_idx))
 	
 		model = nets.resnet50(num_classes)
-		optimizer = optim.RMSprop(model.parameters())
+		optimizer = optim.RMSprop(model.parameters(), lr = learning_rate)
 		loaders = {'train': loader_train, 'val': loader_val}
 		acc[counter] = train_loop(model, loaders, optimizer, epochs=100, filename=filename)
 
