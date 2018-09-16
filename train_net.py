@@ -195,7 +195,7 @@ def train_network(ssh = True):
 		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 40, sampler = sampler.SubsetRandomSampler(test_idx))
 	
 		model = nets.resnet50(num_classes)
-		optimizer = optim.RMSprop(model.parameters(), lr = learning_rate)
+		optimizer = optim.RMSprop(model.parameters(), momentum = 0.9, weight_decay = 0.9, lr = learning_rate)
 		loaders = {'train': loader_train, 'val': loader_val}
 		acc[counter] = train_loop(model, loaders, optimizer, epochs=100, filename=filename)
 
