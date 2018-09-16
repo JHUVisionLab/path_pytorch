@@ -104,7 +104,6 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None):
 		model = nn.DataParallel(model)
 	
 	model = model.to(device=device)  # move the model parameters to CPU/GPU
-	model.train()
 	loader_train = loaders['train']
 	loader_val = loaders['val']
 	print('training begins')
@@ -177,14 +176,14 @@ def train_network(ssh = True):
 	# path_data_train and path_data_val should have different transformation (path_data_val should not apply data augmentation)
 	# therefore we shuffle path_data_train and copy its shuffled image ids and corresponding labels over to path_data_val
 	path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = True, transform=transformation_train)
-	path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = False, transform=transformation_val)
+		# path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = False, transform=transformation_val)
 
-	path_data_val.img_ids = path_data_train.img_ids.copy()
-	path_data_val.img_labels = path_data_train.img_labels.copy()
+		# path_data_val.img_ids = path_data_train.img_ids.copy()
+		# path_data_val.img_labels = path_data_train.img_labels.copy()
 
 	# make sure the two datasets are identical in ids and labels
-	assert np.all(np.equal(path_data_val.img_ids, path_data_train.img_ids))
-	assert np.all(np.equal(path_data_val.img_labels, path_data_train.img_labels))
+		# assert np.all(np.equal(path_data_val.img_ids, path_data_train.img_ids))
+		# assert np.all(np.equal(path_data_val.img_labels, path_data_train.img_labels))
 
 	acc = np.zeros((k,))
 	counter = 0
@@ -193,7 +192,7 @@ def train_network(ssh = True):
 		filename = 'results_' + str(counter) + '.csv'
 		
 		loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
-		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 40, sampler = sampler.SubsetRandomSampler(test_idx))
+		loader_val = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = 40, sampler = sampler.SubsetRandomSampler(test_idx))
 	
 		model = nets.resnet50_train(num_classes)
 		print(model)
