@@ -155,7 +155,7 @@ def train_network(ssh = True):
 	# 														std=[0.229, 0.224, 0.225])
 	# 										   ])
 	transformation_train = transforms.Compose([transforms.Resize([224, 224]),
-											   # transforms.RandomApply([transforms.ColorJitter()]),
+											   transforms.RandomApply([transforms.ColorJitter()]),
 											   transforms.RandomVerticalFlip(),
 											   transforms.RandomHorizontalFlip(),
 											   transforms.ToTensor(),
@@ -176,14 +176,14 @@ def train_network(ssh = True):
 	# path_data_train and path_data_val should have different transformation (path_data_val should not apply data augmentation)
 	# therefore we shuffle path_data_train and copy its shuffled image ids and corresponding labels over to path_data_val
 	path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = True, transform=transformation_train)
-		# path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = False, transform=transformation_val)
+	path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = False, transform=transformation_val)
 
-		# path_data_val.img_ids = path_data_train.img_ids.copy()
-		# path_data_val.img_labels = path_data_train.img_labels.copy()
+	path_data_val.img_ids = path_data_train.img_ids.copy()
+	path_data_val.img_labels = path_data_train.img_labels.copy()
 
 	# make sure the two datasets are identical in ids and labels
-		# assert np.all(np.equal(path_data_val.img_ids, path_data_train.img_ids))
-		# assert np.all(np.equal(path_data_val.img_labels, path_data_train.img_labels))
+	assert np.all(np.equal(path_data_val.img_ids, path_data_train.img_ids))
+	assert np.all(np.equal(path_data_val.img_labels, path_data_train.img_labels))
 
 	acc = np.zeros((k,))
 	counter = 0
@@ -192,7 +192,7 @@ def train_network(ssh = True):
 		filename = 'results_' + str(counter) + '.csv'
 		
 		loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
-		loader_val = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = 40, sampler = sampler.SubsetRandomSampler(test_idx))
+		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 40, sampler = sampler.SubsetRandomSampler(test_idx))
 	
 		model = nets.resnet50_train(num_classes)
 		print(model)
@@ -200,9 +200,9 @@ def train_network(ssh = True):
 		for name, p in model.named_parameters():
 			print(name, p.requires_grad)
 
-		optimizer = optim.RMSprop(filter(lambda p: p.requires_grad, model.parameters()), momentum = 0.9, weight_decay = 0.9, lr = learning_rate)
+		optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate)
 		loaders = {'train': loader_train, 'val': loader_val}
-		acc[counter] = train_loop(model, loaders, optimizer, epochs=100, filename=filename)
+		acc[counter] = train_loop(model, loaders, optimizer, epochs=200, filename=filename)
 
 		counter+=1
 	
