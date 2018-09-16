@@ -140,14 +140,14 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None):
 def train_network(ssh = True):
 	NUM_TRAIN = 360
 	NUM_VAL = 40
-	batch_size = 50
+	batch_size = 32
 	learning_rate = 1e-3
 	k = 10
 	num_classes = 4
 	transformation_train = transforms.Compose([transforms.RandomChoice([transforms.Resize([224, 224]), 
 																		transforms.RandomCrop([224, 224]),
 																		transforms.RandomResizedCrop(224)]),
-											   transforms.RandomApply([transforms.ColorJitter()]),
+											   # transforms.RandomApply([transforms.ColorJitter()]),
 											   transforms.RandomVerticalFlip(),
 											   transforms.RandomHorizontalFlip(),
 											   transforms.ToTensor(),
@@ -155,7 +155,7 @@ def train_network(ssh = True):
 															std=[0.229, 0.224, 0.225])
 											   ])
 
-	transformation_val = transforms.Compose([transforms.Resize([224, 224]),
+	transformation_val = transforms.Compose([transforms.CenterCrop([224, 224]),
 											 transforms.ToTensor(),
 											 transforms.Normalize(mean=[0.485, 0.456, 0.406],
 															std=[0.229, 0.224, 0.225])
@@ -189,7 +189,7 @@ def train_network(ssh = True):
 		model = nets.resnet50(num_classes)
 		optimizer = optim.RMSprop(model.parameters())
 		loaders = {'train': loader_train, 'val': loader_val}
-		acc[counter] = train_loop(model, loaders, optimizer, epochs=800, filename=filename)
+		acc[counter] = train_loop(model, loaders, optimizer, epochs=100, filename=filename)
 
 		counter+=1
 	
