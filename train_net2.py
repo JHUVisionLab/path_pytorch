@@ -10,6 +10,7 @@ from torchvision import transforms, utils, models
 from PIL import Image
 from cross_validation import k_folds
 
+
 import pandas as pd
 
 
@@ -21,6 +22,7 @@ import torch.optim as optim
 import torch.nn.functional as F  # useful stateless functions
 
 import nets 
+import transformations
 from PathologyDataset import PathologyDataset
 #### Settings 
 
@@ -175,7 +177,7 @@ def train_network(ssh = True):
 
 	# path_data_train and path_data_val should have different transformation (path_data_val should not apply data augmentation)
 	# therefore we shuffle path_data_train and copy its shuffled image ids and corresponding labels over to path_data_val
-	path_data = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = True, transform=transformation_train)
+	path_data = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = True, transform=transformations.singleresize())
 		# path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = False, transform=transformation_val)
 
 		# path_data_val.img_ids = path_data_train.img_ids.copy()

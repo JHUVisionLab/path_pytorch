@@ -21,6 +21,7 @@ import torch.optim as optim
 import torch.nn.functional as F  # useful stateless functions
 
 import nets 
+import transformations
 from PathologyDataset import PathologyDataset
 #### Settings 
 
@@ -132,10 +133,12 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None):
 				print('Epoch %d of %d, Iteration %d, loss = %.4f' % (e+1, epochs, t+1, loss.item()))
 				print()
 
-		acc = check_accuracy(loader_val, model, train=True)
+		acc = check_accuracy(loader_val, model, train=True, filename=None)
 
+	print()
 	acc = check_accuracy(loader_val, model, train=False, filename=filename)
 	return acc
+
 
 def train_network(ssh = True):
 	NUM_TRAIN = 360
@@ -144,30 +147,7 @@ def train_network(ssh = True):
 	learning_rate = 1e-3
 	k = 10
 	num_classes = 4
-	# transformation_train = transforms.Compose([transforms.RandomChoice([transforms.Resize([224, 224]), 
-	# 																	transforms.RandomCrop([224, 224]),
-	# 																	transforms.RandomResizedCrop(224)]),
-	# 										   # transforms.RandomApply([transforms.ColorJitter()]),
-	# 										   transforms.RandomVerticalFlip(),
-	# 										   transforms.RandomHorizontalFlip(),
-	# 										   transforms.ToTensor(),
-	# 										   transforms.Normalize(mean=[0.485, 0.456, 0.406],
-	# 														std=[0.229, 0.224, 0.225])
-	# 										   ])
-	transformation_train = transforms.Compose([transforms.Resize([224, 224]),
-											   transforms.RandomApply([transforms.ColorJitter()]),
-											   transforms.RandomVerticalFlip(),
-											   transforms.RandomHorizontalFlip(),
-											   transforms.ToTensor(),
-											   transforms.Normalize(mean=[0.485, 0.456, 0.406],
-															std=[0.229, 0.224, 0.225])
-											   ])
 
-	transformation_val = transforms.Compose([transforms.Resize([224, 224]),
-											 transforms.ToTensor(),
-											 transforms.Normalize(mean=[0.485, 0.456, 0.406],
-															std=[0.229, 0.224, 0.225])
-											])
 	if ssh:
 		root_dir='/workspace/path_data/Part-A_Original'
 	else:
@@ -175,38 +155,51 @@ def train_network(ssh = True):
 
 	# path_data_train and path_data_val should have different transformation (path_data_val should not apply data augmentation)
 	# therefore we shuffle path_data_train and copy its shuffled image ids and corresponding labels over to path_data_val
-	path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = True, transform=transformation_train)
-	path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = False, transform=transformation_val)
+	path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = True, transform=transformations.multiresize())
+	path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = False, transform=transformations.val())
 
 	path_data_val.img_ids = path_data_train.img_ids.copy()
 	path_data_val.img_labels = path_data_train.img_labels.copy()
 
-	# make sure the two datasets are identical in ids and labels
-	assert np.all(np.equal(path_data_val.img_ids, path_data_train.img_ids))
-	assert np.all(np.equal(path_data_val.img_labels, path_data_train.img_labels))
-
+	# initialize acc vector for cv results 
 	acc = np.zeros((k,))
+	
+	# fold counter
 	counter = 0
+
+	# k-fold eval
 	for train_idx, test_idx in k_folds(n_splits = k):
 		print('training and evaluating fold ', counter)
+		### result file
 		filename = 'results_' + str(counter) + '.csv'
 		
+		### initialize data loaders
 		loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
 		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 40, sampler = sampler.SubsetRandomSampler(test_idx))
-	
+		loaders = {'train': loader_train, 'val': loader_val}
+		### initialize model
 		model = nets.resnet50_train(num_classes)
 		print(model)
+		print()
 
 		for name, p in model.named_parameters():
 			print(name, p.requires_grad)
 
+		### initialize optimizer
 		optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate)
-		loaders = {'train': loader_train, 'val': loader_val}
+		
+		### call training/eval
 		acc[counter] = train_loop(model, loaders, optimizer, epochs=200, filename=filename)
 
+		### update counter
 		counter+=1
 	
 	print('k-fold CV accuracy: ', acc)
 	print('final mean accuracy: ', np.mean(acc))
+
+def test_cv(dset1, dset2):
+	# make sure the two datasets are identical in ids and labels
+	assert np.all(np.equal(dset1.img_ids, dset2.img_ids))
+	assert np.all(np.equal(dset1.img_labels, dset2.img_labels))
 
 train_network()

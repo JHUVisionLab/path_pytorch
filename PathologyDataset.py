@@ -68,6 +68,4 @@ class PathologyDataset(Dataset):
 
         return img, label
     
-    def set_transformation(transformation):
-        self.transform = transformation
 

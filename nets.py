@@ -66,9 +66,12 @@ def resnet50(num_classes):
 
 def resnet50_train(num_classes):
   model = resnet50_fc(pretrained=True, num_classes = 4)
+
+  ### Freeze base model of resnet
   for param in model.parameters():
       param.requires_grad = False
-  pdb.set_trace()
+
+  ### Set fc layers to be trainabale
   model.fc1.weight.requires_grad = True
   model.fc1.bias.requires_grad = True
   model.fc2.weight.requires_grad = True
