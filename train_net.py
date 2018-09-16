@@ -104,6 +104,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None):
 		model = nn.DataParallel(model)
 	
 	model = model.to(device=device)  # move the model parameters to CPU/GPU
+	model.train()
 	loader_train = loaders['train']
 	loader_val = loaders['val']
 	print('training begins')
@@ -195,6 +196,7 @@ def train_network(ssh = True):
 		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 40, sampler = sampler.SubsetRandomSampler(test_idx))
 	
 		model = nets.resnet50_train(num_classes)
+		print(model)
 
 		for name, p in model.named_parameters():
 			print(name, p.requires_grad)

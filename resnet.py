@@ -151,6 +151,7 @@ class ResNet(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.fc1(x)
         x = self.dropout(x)
+        x = nn.ReLu(x)
         x = self.fc2(x)
 
         return x
@@ -185,7 +186,7 @@ def resnet50(pretrained=False, **kwargs):
     """
     model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet50']))
+        model.load_state_dict(model_zoo.load_url(model_urls['resnet50'], strict = False))
     return model
 
 
