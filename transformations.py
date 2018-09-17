@@ -1,6 +1,6 @@
 from torchvision import transforms
 def multiresize():
-	resize_list = [transforms.Resize([224, 224]), transforms.RandomCrop([224, 224]),transforms.RandomResizedCrop(224), transforms.CenterCrop([224,224])]
+	resize_list = [transforms.Resize([224, 224]), transforms.RandomCrop([224, 224]),transforms.RandomResizedCrop(size = 224, scale = (0.4,1)), transforms.CenterCrop([224,224])]
 	random_apply_list = [transforms.ColorJitter()]
 	transformation = transforms.Compose([transforms.Resize([1024,748]),
 										transforms.RandomChoice(resize_list),
