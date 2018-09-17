@@ -155,7 +155,7 @@ def train_network(ssh = True):
 
 	# path_data_train and path_data_val should have different transformation (path_data_val should not apply data augmentation)
 	# therefore we shuffle path_data_train and copy its shuffled image ids and corresponding labels over to path_data_val
-	path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = True, transform=transformations.multiresize())
+	path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = True, transform=transformations.randomcrop_resize())
 	path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = False, transform=transformations.val())
 
 	path_data_val.img_ids = path_data_train.img_ids.copy()
