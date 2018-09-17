@@ -64,7 +64,6 @@ class PathologyDataset(Dataset):
         label = self.img_labels[idx]
         
         if self.transform:
-            pdb.set_trace()
             img = self.transform(img)
 
         return img, label
