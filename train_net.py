@@ -91,6 +91,7 @@ def check_accuracy(loader, model, train, filename=None):
 
 				y_list = np.append(y_list, y, axis = 0)
 				pred_list = np.append(pred_list, preds, axis = 0)
+				eval_list = np.append(eval_list, preds == y, axis = 0)
 
 		acc = float(num_correct) / num_samples
 		print('Got %d / %d correct (%.2f)' % (num_correct, num_samples, 100 * acc))
