@@ -78,7 +78,6 @@ def check_accuracy(loader, model, train, filename=None):
 			num_samples += preds.size(0)
 			
 			if not train:
-				pdb.set_trace()
 				y = y.data.cpu().numpy()
 				preds = preds.data.cpu().numpy()
 				p = F.softmax(scores).data.cpu().numpy()
@@ -197,7 +196,7 @@ def train_network(ssh = True):
 		filename = 'results_' + str(counter) + '.csv'
 		
 		### initialize data loaders
-		loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, sampler = sampler.SubsetRandomSampler([0,1,2,3]))
+		loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx)
 		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 4, sampler = sampler.SubsetRandomSampler(test_idx))
 		loaders = {'train': loader_train, 'val': loader_val}
 		### initialize model
@@ -212,7 +211,7 @@ def train_network(ssh = True):
 		optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate)
 		
 		### call training/eval
-		acc[counter] = train_loop(model, loaders, optimizer, epochs=1, filename=filename)
+		acc[counter] = train_loop(model, loaders, optimizer, epochs=100, filename=filename)
 
 		### update counter
 		counter+=1
