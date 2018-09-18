@@ -97,7 +97,6 @@ def _max_tile_3res(results, num_images):
   Args: [num_images*(18*13+4*3+1),1,1,2048]
   Returns: [num_images,1,1,6144]
   """
-  pdb.set_trace()
   list_images = list(torch.chunk(results, num_images,0))
   del results
   counter=0
@@ -366,7 +365,6 @@ class ResNet_Tiling(nn.Module):
 		return nn.Sequential(*layers)
 
 	def forward(self, x):
-		pdb.set_trace()
 		num_images = x.shape[0]
 		x = tile_images_FP(x)
 		x = batch_image_normalize(x, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -382,7 +380,6 @@ class ResNet_Tiling(nn.Module):
 
 		x = self.avgpool(x)
 		x = _max_tile_3res(x, num_images)
-		pdb.set_trace()
 		x = x.view(num_images, -1)
 		x = self.fc1(x)
 		x = self.dropout(x)
