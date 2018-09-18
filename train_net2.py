@@ -142,7 +142,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None):
 def train_network(ssh = True):
 	NUM_TRAIN = 360
 	NUM_VAL = 40
-	batch_size = 4
+	batch_size = 2
 	learning_rate = 1e-3
 	k = 10
 	num_classes = 4
