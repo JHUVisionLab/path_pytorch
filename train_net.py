@@ -52,6 +52,15 @@ def check_accuracy(loader, model, train, filename=None):
 	"""
 	num_correct = 0
 	num_samples = 0
+	if not train:
+		c0_list = np.empty(0,1, dtype = float)
+		c1_list = np.empty(0,1, dtype = float)
+		c2_list= np.empty(0,1, dtype = float)
+		c3_list = np.empty(0,1, dtype = float)
+		pred_list = np.empty(0, 1, dtype = int)
+		y_list = np.empty(0,1, dtype = int)
+		eval_list = np.empty(0,1, dtype = bool)
+
 	model.eval()  # set model to evaluation mode
 	
 	if train:
@@ -67,25 +76,36 @@ def check_accuracy(loader, model, train, filename=None):
 			_, preds = scores.max(1)
 			num_correct += (preds == y).sum()
 			num_samples += preds.size(0)
+			
 			if not train:
-				p = F.softmax(scores).data.cpu().numpy()
-				c0, c1, c2, c3 = np.split(p, 4, axis = 1)
 				y = y.data.cpu().numpy()
 				preds = preds.data.cpu().numpy()
-				results_dict = {'p0': c0.squeeze(), 
-								'p1': c1.squeeze(), 
-								'p2': c2.squeeze(), 
-								'p3': c3.squeeze(), 
-								'label': y, 
-								'pred': preds, 
-								'eval': preds == y}
-				results = pd.DataFrame.from_dict(results_dict)
-				results.to_csv(filename, index = False)
+				p = F.softmax(scores).data.cpu().numpy()
+				
+				c0, c1, c2, c3 = np.split(p, 4, axis = 1)
+				c0_list = np.append(c0_list, c0)
+				c1_list = np.append(c1_list, c1)
+				c2_list = np.append(c2_list, c2)
+				c3_list = np.append(c3_list, c3)
 
-		
+				y_list = np.append(y_list, y, axis = 0)
+				pred_list = np.append(pred_list, preds, axis = 0)
+
 		acc = float(num_correct) / num_samples
 		print('Got %d / %d correct (%.2f)' % (num_correct, num_samples, 100 * acc))
 		print()
+
+		if not train:
+			results_dict = {'p0': c0_list.squeeze(), 
+						'p1': c1_list.squeeze(), 
+						'p2': c2_list.squeeze(), 
+						'p3': c3_list.squeeze(), 
+						'label': y_list, 
+						'pred': pred_list, 
+						'eval': eval_list}
+			results = pd.DataFrame.from_dict(results_dict)
+			results.to_csv(filename, index = False)
+		
 		return acc
 
 
@@ -143,7 +163,8 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None):
 def train_network(ssh = True):
 	NUM_TRAIN = 360
 	NUM_VAL = 40
-	batch_size = 32
+	#batch_size = 32
+	batch_size = 4
 	learning_rate = 1e-3
 	k = 10
 	num_classes = 4
@@ -155,8 +176,8 @@ def train_network(ssh = True):
 
 	# path_data_train and path_data_val should have different transformation (path_data_val should not apply data augmentation)
 	# therefore we shuffle path_data_train and copy its shuffled image ids and corresponding labels over to path_data_val
-	path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = True, transform=transformations.randomcrop_resize())
-	path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = False, transform=transformations.val())
+	path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = True, transform=transformations.tiling_train()) #randomcrop_resize())
+	path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = False, transform=transformations.tiling_val())
 
 	path_data_val.img_ids = path_data_train.img_ids.copy()
 	path_data_val.img_labels = path_data_train.img_labels.copy()
@@ -175,10 +196,10 @@ def train_network(ssh = True):
 		
 		### initialize data loaders
 		loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
-		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 40, sampler = sampler.SubsetRandomSampler(test_idx))
+		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 4, sampler = sampler.SubsetRandomSampler(test_idx))
 		loaders = {'train': loader_train, 'val': loader_val}
 		### initialize model
-		model = nets.resnet50_train(num_classes)
+		model = nets.resnet50_train_tiling(num_classes)
 		print(model)
 		print()
 
@@ -189,7 +210,7 @@ def train_network(ssh = True):
 		optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate)
 		
 		### call training/eval
-		acc[counter] = train_loop(model, loaders, optimizer, epochs=200, filename=filename)
+		acc[counter] = train_loop(model, loaders, optimizer, epochs=1, filename=filename)
 
 		### update counter
 		counter+=1

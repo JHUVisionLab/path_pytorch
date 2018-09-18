@@ -7,7 +7,7 @@ from torch.utils.data import Dataset, DataLoader
 from torch.utils.data import sampler
 from torch.utils.data import random_split
 from torchvision import transforms, utils, models
-from resnet import resnet50_fc
+from resnet import resnet50_fc, resnet50_tiling
 
 import pdb
 
@@ -66,14 +66,8 @@ def resnet50(num_classes):
 
 def resnet50_train(num_classes):
   model = resnet50_fc(pretrained=True, num_classes = 4)
+  return model
 
-  ### Freeze base model of resnet
-  for param in model.parameters():
-      param.requires_grad = False
-
-  ### Set fc layers to be trainabale
-  model.fc1.weight.requires_grad = True
-  model.fc1.bias.requires_grad = True
-  model.fc2.weight.requires_grad = True
-  model.fc2.bias.requires_grad = True
+def resnet50_train_tiling(num_classes):
+  model = resnet50_tiling(pretrained=True, num_classes = 4)
   return model

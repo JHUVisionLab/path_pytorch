@@ -142,7 +142,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None):
 def train_network(ssh = True):
 	NUM_TRAIN = 360
 	NUM_VAL = 40
-	batch_size = 32
+	batch_size = 4
 	learning_rate = 1e-3
 	k = 10
 	num_classes = 4
@@ -177,7 +177,7 @@ def train_network(ssh = True):
 
 	# path_data_train and path_data_val should have different transformation (path_data_val should not apply data augmentation)
 	# therefore we shuffle path_data_train and copy its shuffled image ids and corresponding labels over to path_data_val
-	path_data = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = True, transform=transformations.singleresize())
+	path_data = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = True, transform=transformations.tiling())
 		# path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', root_dir=root_dir, shuffle = False, transform=transformation_val)
 
 		# path_data_val.img_ids = path_data_train.img_ids.copy()
