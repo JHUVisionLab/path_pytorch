@@ -53,13 +53,13 @@ def check_accuracy(loader, model, train, filename=None):
 	num_correct = 0
 	num_samples = 0
 	if not train:
-		c0_list = np.empty(0,1, dtype = np.float32)
-		c1_list = np.empty(0,1, dtype = np.float32)
-		c2_list= np.empty(0,1, dtype = np.float32)
-		c3_list = np.empty(0,1, dtype = np.float32)
-		pred_list = np.empty(0, 1, dtype = np.uint8)
-		y_list = np.empty(0,1, dtype = np.uint8)
-		eval_list = np.empty(0,1, dtype = bool)
+		c0_list = np.empty((0,1), dtype = np.float32)
+		c1_list = np.empty((0,1), dtype = np.float32)
+		c2_list= np.empty((0,1), dtype = np.float32)
+		c3_list = np.empty((0,1), dtype = np.float32)
+		pred_list = np.empty((0,1), dtype = np.uint8)
+		y_list = np.empty((0,1), dtype = np.uint8)
+		eval_list = np.empty((0,1), dtype = bool)
 
 	model.eval()  # set model to evaluation mode
 	
