@@ -19,10 +19,11 @@ model_urls = {
 }
 def batch_image_normalize(images,  mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]):
 	batchsize, h, w = images.shape[0], images.shape[2], images.shape[3]
-	mean = torch.tensor(mean).view(1,3,1,1)
+	device = images.device
+	mean = torch.tensor(mean, device = device).view(1,3,1,1)
 	#mean = torch.tensor(mean).expand(batchsize,3, h, w)
 
-	std = torch.tensor(std).view(1,3,1,1)
+	std = torch.tensor(std, device = device).view(1,3,1,1)
 	#std = torch.tensor(std).expand(batchsize,3,h,w)
 	normalized = images.sub_(mean).div_(std)
 	return normalized
