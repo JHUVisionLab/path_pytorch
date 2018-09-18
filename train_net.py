@@ -165,7 +165,7 @@ def train_network(ssh = True):
 	NUM_TRAIN = 360
 	NUM_VAL = 40
 	#batch_size = 32
-	batch_size = 2
+	batch_size = 3
 	learning_rate = 1e-3
 	k = 10
 	num_classes = 4
@@ -197,7 +197,7 @@ def train_network(ssh = True):
 		
 		### initialize data loaders
 		loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
-		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 4, sampler = sampler.SubsetRandomSampler(test_idx))
+		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(test_idx))
 		loaders = {'train': loader_train, 'val': loader_val}
 		### initialize model
 		model = nets.resnet50_train_tiling(num_classes)
