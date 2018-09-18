@@ -196,7 +196,7 @@ def train_network(ssh = True):
 		filename = 'results_' + str(counter) + '.csv'
 		
 		### initialize data loaders
-		loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx)
+		loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
 		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = 4, sampler = sampler.SubsetRandomSampler(test_idx))
 		loaders = {'train': loader_train, 'val': loader_val}
 		### initialize model
