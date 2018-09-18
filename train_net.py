@@ -165,8 +165,8 @@ def train_network(ssh = True):
 	NUM_TRAIN = 360
 	NUM_VAL = 40
 	#batch_size = 32
-	batch_size = 3
-	learning_rate = 1e-3
+	batch_size = 4
+	learning_rate = 5e-4
 	k = 10
 	num_classes = 4
 
@@ -208,7 +208,7 @@ def train_network(ssh = True):
 			print(name, p.requires_grad)
 
 		### initialize optimizer
-		optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate)
+		optimizer = optim.RMSprop(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate)
 		
 		### call training/eval
 		acc[counter] = train_loop(model, loaders, optimizer, epochs=100, filename=filename)
