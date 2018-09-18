@@ -55,7 +55,7 @@ def check_accuracy(loader, model, train, filename=None):
 	if not train:
 		c0_list = np.empty((0,1), dtype = np.float32)
 		c1_list = np.empty((0,1), dtype = np.float32)
-		c2_list= np.empty((0,)1, dtype = np.float32)
+		c2_list= np.empty((0,1), dtype = np.float32)
 		c3_list = np.empty((0,1), dtype = np.float32)
 		pred_list = np.empty((0,), dtype = np.uint8)
 		y_list = np.empty((0,), dtype = np.uint8)
