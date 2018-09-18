@@ -380,6 +380,7 @@ class ResNet_Tiling(nn.Module):
 
 		x = self.avgpool(x)
 		x = _max_tile_3res(x, num_images)
+		pdb.set_trace()
 		x = x.view(x.size(0), -1)
 		x = self.fc1(x)
 		x = self.dropout(x)
