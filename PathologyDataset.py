@@ -68,7 +68,7 @@ class PathologyDataset(Dataset):
 
 		return img, label
   
-  class PathologyDataset_Tiling(Dataset):
+class PathologyDataset_Tiling(Dataset):
 	"""Pathology dataset"""
 	def __init__(self, root_dir, csv_file = 'microscopy_ground_truth.csv', transform=transforms.ToTensor(), shuffle = False, tiling = False):
 		"""
