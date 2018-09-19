@@ -108,7 +108,7 @@ def _max_tile_3res(results, num_images):
     res_base, res1, res2 = torch.split(im,[1,12,234],0) #hardcoded
     max1, _ = torch.max(res1, dim=0, keepdim=True)
     max2, _ = torch.max(res2, dim=0, keepdim=True)
-    list_images[counter] = torch.cat([res_base,max1,max2,],0)
+    list_images[counter] = torch.cat([res_base,max1,max2,],1)
     counter += 1
 
   return torch.cat(list_images,0)
@@ -371,7 +371,7 @@ class ResNet_Tiling(nn.Module):
 	def forward(self, x):
 		num_images = x.shape[0]
 		x = tile_images_FP(x)
-		x = batch_image_normalize(x, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+		# x = batch_image_normalize(x, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 		x = self.conv1(x)
 		x = self.bn1(x)
 		x = self.relu(x)
@@ -384,7 +384,7 @@ class ResNet_Tiling(nn.Module):
 
 		x = self.avgpool(x)
 		x = _max_tile_3res(x, num_images)
-		x = x.view(num_images, -1)
+		x = x.view(x.size(0), -1)
 		x = self.fc1(x)
 		x = self.dropout(x)
 		x = F.relu(x)
