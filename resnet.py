@@ -103,7 +103,6 @@ def _max_tile_3res(results, num_images):
   list_images = list(torch.chunk(results, num_images,0))
   del results
   counter=0
-  pdb.set_trace()
   for im in list_images:
     res_base, res1, res2 = torch.split(im,[1,12,234],0) #hardcoded
     max1, _ = torch.max(res1, dim=0, keepdim=True)
@@ -384,7 +383,6 @@ class ResNet_Tiling(nn.Module):
 
 		x = self.avgpool(x)
 		x = _max_tile_3res(x, num_images)
-		pdb.set_trace()
 		x = x.view(x.size(0), -1)
 		x = self.fc1(x)
 		x = self.dropout(x)
