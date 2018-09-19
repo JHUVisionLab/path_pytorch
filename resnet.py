@@ -29,8 +29,11 @@ def batch_image_normalize(images,  mean=[0.485, 0.456, 0.406], std=[0.229, 0.224
 	return normalized
 
 def test_normalize():
+	mean=[0.485, 0.456, 0.406]
+	std=[0.229, 0.224, 0.225]
 	images = torch.zeros(4,3,1536, 2048)
-	print(batch_image_normalize(images))
+	normalized = batch_image_normalize(images, mean, std)
+	print(normalized.shape)
 
 def tile_images_FP(images):
 
@@ -100,6 +103,7 @@ def _max_tile_3res(results, num_images):
   list_images = list(torch.chunk(results, num_images,0))
   del results
   counter=0
+  pdb.set_trace()
   for im in list_images:
     res_base, res1, res2 = torch.split(im,[1,12,234],0) #hardcoded
     max1, _ = torch.max(res1, dim=0, keepdim=True)
