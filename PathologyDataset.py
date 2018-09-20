@@ -22,7 +22,7 @@ import torch.nn.functional as F  # useful stateless functions
 import nets 
 class PathologyDataset(Dataset):
 	"""Pathology dataset"""
-	def __init__(self, root_dir, csv_file = 'microscopy_ground_truth.csv', transform=transforms.ToTensor(), shuffle = False):
+	def __init__(self, img_dir, csv_file = 'microscopy_ground_truth.csv', transform=transforms.ToTensor(), shuffle = False):
 		"""
 		Args:
 			csv_file (string): Path to the csv file with annotations.
@@ -30,7 +30,7 @@ class PathologyDataset(Dataset):
 			transform (callable, optional): Optional transform to be applied on a sample
 			shuffle (boolean): Whether to shuffle
 		"""
-		data = pd.read_csv(os.path.join(root_dir, "microscopy_ground_truth.csv"), header = None).values
+		data = pd.read_csv(os.path.join(img_dir, "microscopy_ground_truth.csv"), header = None).values
 		
 		#shuffle data
 		if shuffle:
@@ -50,14 +50,14 @@ class PathologyDataset(Dataset):
 
 		self.img_ids = img_ids
 		self.img_labels = img_labels
-		self.root_dir = root_dir
+		self.img_dir = img_dir
 		self.transform = transform
 
 	def __len__(self):
 		return len(self.img_ids)
 
 	def __getitem__(self, idx):
-		img_name = os.path.join(self.root_dir,
+		img_name = os.path.join(self.img_dir,
 								self.img_ids[idx])
 		
 		img = Image.open(img_name, mode='r')
