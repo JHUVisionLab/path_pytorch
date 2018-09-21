@@ -541,7 +541,7 @@ def resnet50_tiling2(pretrained=False, **kwargs):
 	Args:
 		pretrained (bool): If True, returns a model pre-trained on ImageNet
 	"""
-	model = ResNet_Tiling(Bottleneck, [3, 4, 6, 3], **kwargs)
+	model = ResNet_Tiling2(Bottleneck, [3, 4, 6, 3], **kwargs)
 	if pretrained:
 		model.load_state_dict(model_zoo.load_url(model_urls['resnet50']), strict = False)
 
