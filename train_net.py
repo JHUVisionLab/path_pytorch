@@ -43,9 +43,9 @@ print('using device:', device)
 NUM_TRAIN = 360
 NUM_VAL = 40
 #batch_size = 32
-batch_size = 4
-EPOCH = 150
-learning_rate = 5e-4
+batch_size = 2
+EPOCH = 85
+learning_rate = 1e-3
 k = 10
 num_classes = 4
 
@@ -113,6 +113,7 @@ def check_accuracy(loader, model, train, cur_epoch = None, filename=None, writer
 
 		if train:
 			writer.add_scalar('eval/loss', total_loss/counter, cur_epoch)
+			writer.add_scalar('eval/acc', acc, cur_epoch)
 		
 		print('Got %d / %d correct (%.2f)' % (num_correct, num_samples, 100 * acc))
 		print()
