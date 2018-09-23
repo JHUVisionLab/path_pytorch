@@ -39,7 +39,7 @@ def tile_images_FP(images):
 
 	if images.shape[2] != 1536 or images.shape[3] != 2048:
 		raise ValueError('Image to be tiled was not 1536x2048, instead it was: '
-					 + images.shape[1] + 'x' + images.shape[2])
+					 + images.shape[2] + 'x' + images.shape[3])
 
 	num_images = images.shape[0]
 	im_list = list(torch.chunk(images,num_images,0))
@@ -55,8 +55,10 @@ def tile_images_FP(images):
 	return torch.cat(im_list,0)
 
 def _tile_base(image):
+	#image = 1536 (H) x 2048 (W)
 	# pad = torch.stack([0,0],[0,32],[0,192],[0,0]])
 	# image = torch.pad(image, pad, 'CONSTANT')
+	pad = (0, 192, 32,0)
 	tile_base = F.interpolate(image, 224, mode = 'bilinear')
 	return tile_base
 
@@ -407,6 +409,8 @@ class ResNet_Tiling2(nn.Module):
 		self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
 		self.avgpool = nn.AvgPool2d(7, stride=1)
 		self.fc1 = nn.Linear(512 * block.expansion * 3, num_classes)
+		self.tiling = tile_images_FP()
+		self.global_maxpool = _max_tile_3res()
 
 		for m in self.modules():
 			if isinstance(m, nn.Conv2d):
@@ -437,7 +441,7 @@ class ResNet_Tiling2(nn.Module):
 
 	def forward(self, x):
 		num_images = x.shape[0]
-		x = tile_images_FP(x)
+		x = self.tiling(x)
 		# x = batch_image_normalize(x, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 		x = self.conv1(x)
 		x = self.bn1(x)
@@ -450,7 +454,7 @@ class ResNet_Tiling2(nn.Module):
 		x = self.layer4(x)
 
 		x = self.avgpool(x)
-		x = _max_tile_3res(x, num_images)
+		x = self.global_maxpool(x, num_images)
 		x = x.view(x.size(0), -1)
 		x = self.fc1(x)
 		return x

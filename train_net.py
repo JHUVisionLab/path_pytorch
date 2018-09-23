@@ -36,7 +36,7 @@ else:
 	device = torch.device('cpu')
 
 # Constant to control how frequently we print train loss
-print_every = 2
+print_every = 10
 
 print('using device:', device)
 
@@ -45,7 +45,7 @@ NUM_VAL = 40
 #batch_size = 32
 batch_size = 2
 EPOCH = 85
-learning_rate = 1e-3
+learning_rate = 6e-4
 k = 10
 num_classes = 4
 
@@ -83,7 +83,6 @@ def check_accuracy(loader, model, train, cur_epoch = None, filename=None, writer
 
 	with torch.no_grad():
 		counter = 0
-		total_loss = 0
 		for x, y in loader:
 			counter += 1
 			x = x.to(device=device, dtype=dtype)  # move to device, e.g. GPU
@@ -236,8 +235,8 @@ def train_network(ssh = True):
 		filename = os.path.join(results_dir, 'results_' + str(counter) + '.csv')
 		
 		### initialize data loaders
-		loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx))
-		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(test_idx))
+		loader_train = torch.utils.data.DataLoader(dataset = path_data_train, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(train_idx),num_workers=4)
+		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(test_idx), num_orkers=4)
 		loaders = {'train': loader_train, 'val': loader_val}
 		### initialize model
 		model = nets.resnet50_train_tiling2(num_classes)
@@ -248,7 +247,7 @@ def train_network(ssh = True):
 			print(name, p.requires_grad)
 
 		### initialize optimizer
-		optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate)
+		optimizer = optim.RMSprop(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9, weight_decay = 0.9, eps = 1.0)
 		
 		### call training/eval
 		acc[counter] = train_loop(model, loaders, optimizer, epochs=EPOCH, filename=filename, log_dir=log_dir)
