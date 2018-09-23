@@ -247,7 +247,7 @@ def train_network(ssh = True):
 			print(name, p.requires_grad)
 
 		### initialize optimizer
-		optimizer = optim.RMSprop(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9, weight_decay = 0.9, eps = 1.0)
+		optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9)
 		
 		### call training/eval
 		acc[counter] = train_loop(model, loaders, optimizer, epochs=EPOCH, filename=filename, log_dir=log_dir)
