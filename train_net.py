@@ -44,8 +44,8 @@ NUM_TRAIN = 360
 NUM_VAL = 40
 #batch_size = 32
 batch_size = 6
-EPOCH = 85
-learning_rate = 1e-3
+EPOCH = 90
+learning_rate = 6e-4
 k = 10
 num_classes = 4
 
@@ -158,11 +158,14 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 	loader_val = loaders['val']
 
 	print('training begins')
+	lr = learning_rate
+	print('base learning rate: ', lr)
 	for e in range(epochs):
 		total_loss = 0
 		counter = 0
 		if e == int(epochs/3) or e == int(epochs*2/3):
-			adjust_learning_rate(optimizer,learning_rate/10)
+			adjust_learning_rate(optimizer,lr/10)
+			lr *= 0.1
 		for t, (x, y) in enumerate(loader_train):
 			counter+=1
 			model.train()  # put model to training mode
@@ -244,7 +247,7 @@ def train_network(ssh = True):
 		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(test_idx), num_workers=4)
 		loaders = {'train': loader_train, 'val': loader_val}
 		### initialize model
-		model = nets.resnet50_train_tiling2(num_classes)
+		model = nets.resnet50_train_tiling(num_classes)
 		print(model)
 		print()
 
