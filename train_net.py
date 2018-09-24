@@ -264,28 +264,28 @@ def train_network(ssh = True):
 	print('final mean accuracy: ', np.mean(acc))
 
 def update_learning_rate(optimizer, new_lr):
-    """Update learning rate"""
-    # Update learning rate, note that different parameter may have different learning rate
-    param_keys = []
-    for ind, param_group in enumerate(optimizer.param_groups):
-    	pdb.set_trace()
-        param_group['lr'] = new_lr
-        param_keys += param_group['params']
+	"""Update learning rate"""
+	# Update learning rate, note that different parameter may have different learning rate
+	param_keys = []
+	for ind, param_group in enumerate(optimizer.param_groups):
+		pdb.set_trace()
+		param_group['lr'] = new_lr
+		param_keys += param_group['params']
 
-    _CorrectMomentum(optimizer, param_keys, 0.1)
+	_CorrectMomentum(optimizer, param_keys, 0.1)
 
 
 def _CorrectMomentum(optimizer, param_keys, correction):
-    """The MomentumSGDUpdate op implements the update V as
-        V := mu * V + lr * grad,
-    where mu is the momentum factor, lr is the learning rate, and grad is
-    the stochastic gradient. Since V is not defined independently of the
-    learning rate (as it should ideally be), when the learning rate is
-    changed we should scale the update history V in order to make it
-    compatible in scale with lr * grad.
-    """
-    for p_key in param_keys:
-        optimizer.state[p_key]['momentum_buffer'] *= correction
+	"""The MomentumSGDUpdate op implements the update V as
+		V := mu * V + lr * grad,
+	where mu is the momentum factor, lr is the learning rate, and grad is
+	the stochastic gradient. Since V is not defined independently of the
+	learning rate (as it should ideally be), when the learning rate is
+	changed we should scale the update history V in order to make it
+	compatible in scale with lr * grad.
+	"""
+	for p_key in param_keys:
+		optimizer.state[p_key]['momentum_buffer'] *= correction
 
 
 def test_cv(dset1, dset2):
