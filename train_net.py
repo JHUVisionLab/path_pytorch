@@ -43,7 +43,7 @@ print('using device:', device)
 NUM_TRAIN = 360
 NUM_VAL = 40
 #batch_size = 32
-batch_size = 2
+batch_size = 6
 EPOCH = 85
 learning_rate = 1e-3
 k = 10
