@@ -44,8 +44,8 @@ NUM_TRAIN = 360
 NUM_VAL = 40
 #batch_size = 32
 batch_size = 2
-EPOCH = 2
-learning_rate = 6e-4
+EPOCH = 85
+learning_rate = 1e-3
 k = 10
 num_classes = 4
 
@@ -161,7 +161,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 	for e in range(epochs):
 		total_loss = 0
 		counter = 0
-		if e == 0:
+		if e == int(epochs/3) or e == int(epochs*2/3):
 			adjust_learning_rate(optimizer,learning_rate/10)
 		for t, (x, y) in enumerate(loader_train):
 			counter+=1
@@ -270,6 +270,7 @@ def adjust_learning_rate(optimizer, new_lr):
         param_group['lr'] = new_lr
     optimizer.load_state_dict(state_dict)
     print('updated learning rate: ', state_dict['param_groups'][0]['lr'])
+    print()
 
 
 def test_cv(dset1, dset2):
