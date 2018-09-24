@@ -161,8 +161,8 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 	for e in range(epochs):
 		total_loss = 0
 		counter = 0
-		if e == epochs/2:
-			update_learning_rate(optimzer, learning_rate/10)
+		if e == 0:
+			update_learning_rate(optimizer, learning_rate/10)
 		for t, (x, y) in enumerate(loader_train):
 			counter+=1
 			model.train()  # put model to training mode
