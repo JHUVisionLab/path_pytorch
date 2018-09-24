@@ -159,7 +159,12 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 
 	print('training begins')
 	for e in range(epochs):
+		total_loss = 0
+		counter = 0
+		if e == epochs/2:
+			update_learning_rate(optimzer, learning_rate/10)
 		for t, (x, y) in enumerate(loader_train):
+			counter+=1
 			model.train()  # put model to training mode
 
 			x = x.to(device=device, dtype=dtype)  # move to device, e.g. GPU
@@ -167,10 +172,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 
 			scores = model(x)
 			loss = F.cross_entropy(scores, y)
-
-			step_num = e * math.ceil(NUM_TRAIN/batch_size) + t
-			if writer: 
-				writer.add_scalar('train/loss', loss, step_num)
+			total_loss+=loss
 
 			# Zero out all of the gradients for the variables which the optimizer
 			# will update.
@@ -187,7 +189,10 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 			if t % print_every == 0 :
 				print('Epoch %d of %d, Iteration %d, loss = %.4f' % (e+1, epochs, t+1, loss.item()))
 				print()
-
+		
+		if writer: 
+			writer.add_scalar('train/loss', loss, step_num)
+		
 		acc = check_accuracy(loader_val, model, train=True, cur_epoch=e, filename=None, writer=writer)
 
 	print()
@@ -258,9 +263,37 @@ def train_network(ssh = True):
 	print('k-fold CV accuracy: ', acc)
 	print('final mean accuracy: ', np.mean(acc))
 
+def update_learning_rate(optimizer, new_lr):
+    """Update learning rate"""
+    # Update learning rate, note that different parameter may have different learning rate
+    param_keys = []
+    for ind, param_group in enumerate(optimizer.param_groups):
+    	pdb.set_trace()
+        param_group['lr'] = new_lr
+        param_keys += param_group['params']
+
+    _CorrectMomentum(optimizer, param_keys, 0.1)
+
+
+def _CorrectMomentum(optimizer, param_keys, correction):
+    """The MomentumSGDUpdate op implements the update V as
+        V := mu * V + lr * grad,
+    where mu is the momentum factor, lr is the learning rate, and grad is
+    the stochastic gradient. Since V is not defined independently of the
+    learning rate (as it should ideally be), when the learning rate is
+    changed we should scale the update history V in order to make it
+    compatible in scale with lr * grad.
+    """
+    for p_key in param_keys:
+        optimizer.state[p_key]['momentum_buffer'] *= correction
+
+
 def test_cv(dset1, dset2):
 	# make sure the two datasets are identical in ids and labels
 	assert np.all(np.equal(dset1.img_ids, dset2.img_ids))
 	assert np.all(np.equal(dset1.img_labels, dset2.img_labels))
+
+
+
 
 train_network()
