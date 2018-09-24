@@ -285,6 +285,7 @@ def _CorrectMomentum(optimizer, param_keys, correction):
 	compatible in scale with lr * grad.
 	"""
 	for p_key in param_keys:
+		pdb.set_trace()
 		optimizer.state[p_key]['momentum_buffer'] *= correction
 
 
