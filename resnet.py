@@ -107,7 +107,6 @@ def _max_tile_3res(results, num_images):
   counter=0
   for im in list_images:
     res_base, res1, res2 = torch.split(im,[1,12,234],0) #hardcoded
-    pdb.set_trace()
     max1, _ = torch.max(res1, dim=0, keepdim=True)
     max2, _ = torch.max(res2, dim=0, keepdim=True)
     list_images[counter] = torch.cat([res_base,max1,max2,],1)
