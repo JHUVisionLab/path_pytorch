@@ -191,7 +191,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 				print()
 		
 		if writer: 
-			writer.add_scalar('train/loss', loss, e)
+			writer.add_scalar('train/loss', total_loss/counter, e)
 		
 		acc = check_accuracy(loader_val, model, train=True, cur_epoch=e, filename=None, writer=writer)
 
