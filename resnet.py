@@ -66,22 +66,28 @@ def _tile_res1(image):
 	#image = 1536 (H) x 2048 (W) --> 384 x 512
 
 	"""
-  	Tile at the coarser resolution (16x downsampled )
+	Tile at the coarser resolution (16x downsampled )
   
-  	Args: 
-    	image: Tensor of shape [1,1536, 2048,3]
+	Args: 
+		image: Tensor of shape [1,1536, 2048,3]
   
-  	Returns: 
-    	Tensor of shape [4*3,3, 224,224]
-  	"""
+	Returns: 
+		Tensor of shape [4*3,3, 224,224]
+	"""
 	image = F.interpolate(image, [384, 512], mode = 'bilinear')
 	pad = (0,48,64,0) #left, right, top, bottom
 	image = F.pad(image, pad, mode = "constant")
 	size = 224
 	stride = 112
-	tiles = image.unfold(2, size, stride).unfold(3, size, stride)
-	tiles = tiles.contiguous().view(-1, 3, 224, 224)
-	return tiles
+	counter = 0
+	
+	for channel in channels:
+		tiles = channel.squeeze().unfold(0, size, stride).unfold(1, size, stride)
+		tiles = tiles.contiguous().view(-1,1,224,224)
+		channels[counter] = tiles
+		counter+=1
+
+	return torch.cat(channels,1)
 
 
 def _tile_res2(image):
@@ -91,37 +97,58 @@ def _tile_res2(image):
 	image = F.pad(image, pad, mode = "constant")
 	size = 224
 	stride = 112
-	tiles = image.unfold(2, size, stride).unfold(3, size, stride)
-	tiles = tiles.contiguous().view(-1, 3, 224, 224)
-	return tiles
+	counter = 0
+	
+	for channel in channels:
+		tiles = channel.squeeze().unfold(0, size, stride).unfold(1, size, stride)
+		tiles = tiles.contiguous().view(-1,1,224,224)
+		channels[counter] = tiles
+		counter+=1
+
+	return torch.cat(channels,1)
 
 def _max_tile_3res(results, num_images):
-  """
-  Finds the max features for the different resolutions
+	"""
+	Finds the max features for the different resolutions
 
-  Args: [num_images*(18*13+4*3+1),1,1,2048]
-  Returns: [num_images,1,1,6144]
-  """
-  list_images = list(torch.chunk(results, num_images,0))
-  del results
-  counter=0
-  for im in list_images:
-    res_base, res1, res2 = torch.split(im,[1,12,234],0) #hardcoded
-    max1, _ = torch.max(res1, dim=0, keepdim=True)
-    max2, _ = torch.max(res2, dim=0, keepdim=True)
-    list_images[counter] = torch.cat([res_base,max1,max2,],1)
-    counter += 1
+	Args: [num_images*(18*13+4*3+1),1,1,2048]
+	Returns: [num_images,1,1,6144]
+	"""
+	list_images = list(torch.chunk(results, num_images,0))
+	del results
+	counter=0
+	for im in list_images:
+		res_base, res1, res2 = torch.split(im,[1,12,234],0) #hardcoded
+		max1, _ = torch.max(res1, dim=0, keepdim=True)
+		max2, _ = torch.max(res2, dim=0, keepdim=True)
+		list_images[counter] = torch.cat([res_base,max1,max2,],1)
+		counter += 1
 
-  return torch.cat(list_images,0)
+	return torch.cat(list_images,0)
 
 def tiling_test():
-	images = torch.rand(4, 3, 1536, 2048)
-	tiles = tile_images_FP(images)
-	print(tiles.shape)
+	import numpy as np
+	images = np.arange(7500).reshape((1,3,50,50))
+	pdb.set_trace()
+	images = torch.from_numpy(images)
+	channels = list(torch.chunk(images,3,1))
+	del images
+	counter=0
+	size = 10
+	stride = 5
+	for channel in channels:
 
-	features = torch.rand(4*(18*13+4*3+1),1,1,2048)
-	max_feat = _max_tile_3res(features, 4)
-	print(max_feat.shape)
+		tiles = channel.squeeze().unfold(0, size, stride).unfold(1, size, stride)
+		pdb.set_trace()
+		tiles = tiles.contiguous().view(-1,1,10,10)
+		channels[counter] = tiles
+		counter+=1
+	
+
+	images = torch.cat(channels,1)
+	pdb.set_trace()
+	print()
+
 
 def conv3x3(in_planes, out_planes, stride=1):
 	"""3x3 convolution with padding"""
