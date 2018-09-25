@@ -47,10 +47,19 @@ def val():
 											])
 	return transformation
 
+# def tiling_train():
+# 	random_apply_list = [transforms.ColorJitter()]
+# 	transformation = transforms.Compose([transforms.RandomApply(random_apply_list),
+# 										transforms.RandomVerticalFlip(),
+# 										transforms.RandomHorizontalFlip(),
+# 										transforms.ToTensor(),
+# 										transforms.Normalize(mean=[0.485, 0.456, 0.406],
+# 															std=[0.229, 0.224, 0.225])])
+# 	return transformation
+
 def tiling_train():
 	random_apply_list = [transforms.ColorJitter()]
-	transformation = transforms.Compose([transforms.RandomApply(random_apply_list),
-										transforms.RandomVerticalFlip(),
+	transformation = transforms.Compose([transforms.RandomVerticalFlip(),
 										transforms.RandomHorizontalFlip(),
 										transforms.ToTensor(),
 										transforms.Normalize(mean=[0.485, 0.456, 0.406],
