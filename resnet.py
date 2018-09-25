@@ -77,6 +77,7 @@ def _tile_res1(image):
 	image = F.interpolate(image, [384, 512], mode = 'bilinear')
 	pad = (0,48,64,0) #left, right, top, bottom
 	image = F.pad(image, pad, mode = "constant")
+	channels = list(torch.chunk(image,3,1))
 	size = 224
 	stride = 112
 	counter = 0
@@ -95,6 +96,7 @@ def _tile_res2(image):
 	#image = 1536 (H) x 2048 (W)
 	pad = (0,80,32,0) #left, right, top, bottom
 	image = F.pad(image, pad, mode = "constant")
+	channels = list(torch.chunk(image,3,1))
 	size = 224
 	stride = 112
 	counter = 0
