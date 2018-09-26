@@ -45,7 +45,7 @@ NUM_VAL = 40
 #batch_size = 32
 batch_size = 6
 EPOCH = 90
-learning_rate = 2e-3
+learning_rate = 2e-4
 k = 10
 num_classes = 4
 
@@ -257,7 +257,7 @@ def train_network(ssh = True):
 
 		### initialize optimizer
 		#optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9)
-		optimizer = optim.RMSprop(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9, weight_decay = 0.9, eps = 1.0)
+		optimizer = optim.RMSprop(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9, weight_decay = 0.0005, eps = 1.0)
 		
 		### call training/eval
 		acc[counter] = train_loop(model, loaders, optimizer, epochs=EPOCH, filename=filename, log_dir=log_dir)

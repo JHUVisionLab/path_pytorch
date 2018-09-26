@@ -148,7 +148,6 @@ def tiling_test():
 	images = torch.cat(channels,1)
 	pdb.set_trace()
 	print()
-tiling_test()
 
 def conv3x3(in_planes, out_planes, stride=1):
 	"""3x3 convolution with padding"""
