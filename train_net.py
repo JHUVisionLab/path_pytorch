@@ -45,7 +45,7 @@ NUM_VAL = 40
 #batch_size = 32
 batch_size = 6
 EPOCH = 85
-learning_rate = 2e-3
+learning_rate = 5e-4
 k = 10
 num_classes = 4
 
