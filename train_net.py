@@ -44,8 +44,8 @@ NUM_TRAIN = 360
 NUM_VAL = 40
 #batch_size = 32
 batch_size = 6
-EPOCH = 90
-learning_rate = 2e-4
+EPOCH = 85
+learning_rate = 2e-3
 k = 10
 num_classes = 4
 
