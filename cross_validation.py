@@ -39,7 +39,6 @@ def k_folds(n_splits = 10, samples = 400):
     Args:
         n_splits: folds number
         subjects: number of patients
-        frames: length of the sequence of each patient
     '''
     indices = np.arange(samples).astype(int)
     for test_idx in get_indices(n_splits, samples):
@@ -55,5 +54,5 @@ def test_kfold(k = 10, samples = 400):
         s = list(train_idx.intersection(test_idx))
         assert s == []
 
-#test_kfold()
+test_kfold()
 

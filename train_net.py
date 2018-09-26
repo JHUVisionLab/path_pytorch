@@ -45,7 +45,7 @@ NUM_VAL = 40
 #batch_size = 32
 batch_size = 6
 EPOCH = 90
-learning_rate = 6e-4
+learning_rate = 2e-3
 k = 10
 num_classes = 4
 
@@ -131,7 +131,7 @@ def check_accuracy(loader, model, train, cur_epoch = None, filename=None, writer
 		return acc
 
 
-def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None, writer = None):
+def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None, writer = None, decay_schedule = False):
 	writer = SummaryWriter(log_dir)
 	"""
 	Train a model on CIFAR-10 using the PyTorch Module API.
@@ -158,12 +158,13 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 	loader_val = loaders['val']
 
 	print('training begins')
-	lr = learning_rate
-	print('base learning rate: ', lr)
+	if decay_schedule:
+		lr = learning_rate
+		print('base learning rate: ', lr)
 	for e in range(epochs):
 		total_loss = 0
 		counter = 0
-		if e == int(epochs/3) or e == int(epochs*2/3):
+		if decay_schedule and (e == int(epochs/3) or e == int(epochs*2/3)):
 			adjust_learning_rate(optimizer,lr/10)
 			lr *= 0.1
 		for t, (x, y) in enumerate(loader_train):
@@ -255,7 +256,8 @@ def train_network(ssh = True):
 			print(name, p.requires_grad)
 
 		### initialize optimizer
-		optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9)
+		#optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9)
+		optimizer = optim.RMSprop(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9, weight_decay = 0.9, eps = 1.0)
 		
 		### call training/eval
 		acc[counter] = train_loop(model, loaders, optimizer, epochs=EPOCH, filename=filename, log_dir=log_dir)

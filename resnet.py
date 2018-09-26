@@ -18,13 +18,11 @@ model_urls = {
 	'resnet152': 'https://download.pytorch.org/models/resnet152-b121ed2d.pth',
 }
 def batch_image_normalize(images,  mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]):
+	""" Normalization of each tile instead of global image - not currently used"""
 	batchsize, h, w = images.shape[0], images.shape[2], images.shape[3]
 	device = images.device
 	mean = torch.tensor(mean, device = device).view(1,3,1,1)
-	#mean = torch.tensor(mean).expand(batchsize,3, h, w)
-
 	std = torch.tensor(std, device = device).view(1,3,1,1)
-	#std = torch.tensor(std).expand(batchsize,3,h,w)
 	normalized = images.sub_(mean).div_(std)
 	return normalized
 
@@ -36,7 +34,7 @@ def test_normalize():
 	print(normalized.shape)
 
 def tile_images_FP(images):
-
+	""" Tile image in a feature pyramid like setup - 3 resolutions (including full image) """
 	if images.shape[2] != 1536 or images.shape[3] != 2048:
 		raise ValueError('Image to be tiled was not 1536x2048, instead it was: '
 					 + images.shape[2] + 'x' + images.shape[3])
@@ -69,7 +67,7 @@ def _tile_res1(image):
 	Tile at the coarser resolution (16x downsampled )
   
 	Args: 
-		image: Tensor of shape [1,1536, 2048,3]
+		image: Tensor of shape [1,3, 1536, 2048]
   
 	Returns: 
 		Tensor of shape [4*3,3, 224,224]
@@ -130,19 +128,19 @@ def _max_tile_3res(results, num_images):
 
 def tiling_test():
 	import numpy as np
-	images = np.arange(7500).reshape((1,3,50,50))
+	images = np.arange(300).reshape((1,3,10,10))
 	pdb.set_trace()
 	images = torch.from_numpy(images)
 	channels = list(torch.chunk(images,3,1))
 	del images
 	counter=0
-	size = 10
-	stride = 5
+	size = 2
+	stride = 2
 	for channel in channels:
 
 		tiles = channel.squeeze().unfold(0, size, stride).unfold(1, size, stride)
 		pdb.set_trace()
-		tiles = tiles.contiguous().view(-1,1,10,10)
+		tiles = tiles.contiguous().view(-1,1,2,2)
 		channels[counter] = tiles
 		counter+=1
 	
@@ -150,7 +148,7 @@ def tiling_test():
 	images = torch.cat(channels,1)
 	pdb.set_trace()
 	print()
-
+tiling_test()
 
 def conv3x3(in_planes, out_planes, stride=1):
 	"""3x3 convolution with padding"""
