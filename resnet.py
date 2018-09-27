@@ -126,29 +126,61 @@ def _max_tile_3res(results, num_images):
 
 	return torch.cat(list_images,0)
 
-def tiling_test():
-	import numpy as np
-	images = np.arange(300).reshape((1,3,10,10))
-	pdb.set_trace()
-	images = torch.from_numpy(images)
-	channels = list(torch.chunk(images,3,1))
-	del images
+def tile_res1_test(image):
+	image = F.interpolate(image, [5, 5], mode = 'bilinear')
+	channels = list(torch.chunk(image,3,1))
+	size = 2
+	stride = 2
+	counter = 0
+	
+	for channel in channels:
+		tiles = channel.squeeze().unfold(0, size, stride).unfold(1, size, stride)
+		tiles = tiles.contiguous().view(-1,1,2,2)
+		channels[counter] = tiles
+		counter+=1
+
+	return torch.cat(channels,1)
+
+def tile_res2_test(image):
+	channels = list(torch.chunk(image,3,1))
 	counter=0
 	size = 2
 	stride = 2
 	for channel in channels:
 
 		tiles = channel.squeeze().unfold(0, size, stride).unfold(1, size, stride)
-		pdb.set_trace()
 		tiles = tiles.contiguous().view(-1,1,2,2)
 		channels[counter] = tiles
 		counter+=1
-	
 
-	images = torch.cat(channels,1)
+	return torch.cat(channels,1)
+def tiling_test():
+	import numpy as np
+	images = np.arange(600,dtype=np.float64).reshape((2,3,10,10))
 	pdb.set_trace()
-	print()
+	images = torch.from_numpy(images)
+	
+	im_list = list(torch.chunk(images, images.shape[0], dim=0))
+    
+	counter = 0
+	for im in im_list:
+		pdb.set_trace()
+		tile_base = F.interpolate(im, 2, mode = 'bilinear')
+		tiles1 = tile_res1_test(im)
+		tiles2 = tile_res2_test(im)
+		im_list[counter] = torch.cat([tile_base,tiles1,tiles2],0)
+		counter+=1
+  
+	tiles = torch.cat(im_list,0)
+	pdb.set_trace()
 
+
+	image1 = torch.tensor(([1,2,2,3])).view(1,4)
+	image2 = torch.tensor(([0,3,2,1])).view(1,4)
+	image = torch.cat([image1,image2],dim=0)
+	print()
+	pdb.set_trace()
+tiling_test()
 def conv3x3(in_planes, out_planes, stride=1):
 	"""3x3 convolution with padding"""
 	return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
