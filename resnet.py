@@ -646,7 +646,7 @@ def resnet50_tiling_2fc(pretrained=False, **kwargs):
 	model.fc2.bias.requires_grad = True
 	return model
 
-def resnet50_tiling_fc(pretrained=False, **kwargs):
+def resnet50_tiling_1fc(pretrained=False, **kwargs):
 	"""Constructs a ResNet-50 model.
 	Args:
 		pretrained (bool): If True, returns a model pre-trained on ImageNet
