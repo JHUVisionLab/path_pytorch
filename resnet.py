@@ -52,7 +52,7 @@ def tile_images_FP(images):
   
 	return torch.cat(im_list,0)
 
-def tile_image_2res(images):
+def tile_images_2res(images):
 	""" Tile image in a feature pyramid like setup - 2 resolutions """
 	if images.shape[2] != 1536 or images.shape[3] != 2048:
 		raise ValueError('Image to be tiled was not 1536x2048, instead it was: '
