@@ -145,7 +145,7 @@ def _max_tile_3res(results, num_images):
 	return torch.cat(list_images,0)
 
 def _max_tile_2res(results, num_images):
-		"""
+	"""
 	Finds the max features for the different resolutions
 
 	Args: [num_images*(18*13+4*3),1,1,2048]
