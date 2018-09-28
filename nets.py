@@ -7,7 +7,7 @@ from torch.utils.data import Dataset, DataLoader
 from torch.utils.data import sampler
 from torch.utils.data import random_split
 from torchvision import transforms, utils, models
-from resnet import resnet50_fc, resnet50_tiling, resnet50_tiling_2fc
+from resnet import resnet50_fc, resnet50_tiling_1fc, resnet50_tiling_2fc
 
 import pdb
 
