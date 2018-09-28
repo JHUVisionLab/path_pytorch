@@ -272,12 +272,12 @@ def train_network(ssh = True):
 
 
 def adjust_learning_rate(optimizer, new_lr):
-    state_dict = optimizer.state_dict()
-    for param_group in state_dict['param_groups']:
-        param_group['lr'] = new_lr
-    optimizer.load_state_dict(state_dict)
-    print('updated learning rate: ', state_dict['param_groups'][0]['lr'])
-    print()
+	state_dict = optimizer.state_dict()
+	for param_group in state_dict['param_groups']:
+		param_group['lr'] = new_lr
+	optimizer.load_state_dict(state_dict)
+	print('updated learning rate: ', state_dict['param_groups'][0]['lr'])
+	print()
 
 
 def test_cv(dset1, dset2):

@@ -199,7 +199,7 @@ def tiling_test():
 	images = torch.from_numpy(images)
 	
 	im_list = list(torch.chunk(images, images.shape[0], dim=0))
-    
+	
 	counter = 0
 	for im in im_list:
 		pdb.set_trace()
