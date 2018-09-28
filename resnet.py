@@ -619,7 +619,7 @@ def resnet50_fc(pretrained=False, **kwargs):
 	model.fc2.bias.requires_grad = True
 	return model
 
-def resnet50_tiling(pretrained=False, **kwargs):
+def resnet50_tiling_2fc(pretrained=False, **kwargs):
 	"""Constructs a ResNet-50 model.
 	Args:
 		pretrained (bool): If True, returns a model pre-trained on ImageNet
@@ -646,12 +646,12 @@ def resnet50_tiling(pretrained=False, **kwargs):
 	model.fc2.bias.requires_grad = True
 	return model
 
-def resnet50_tiling_2fc(pretrained=False, **kwargs):
+def resnet50_tiling_fc(pretrained=False, **kwargs):
 	"""Constructs a ResNet-50 model.
 	Args:
 		pretrained (bool): If True, returns a model pre-trained on ImageNet
 	"""
-	model = ResNet_Tiling_2fc(Bottleneck, [3, 4, 6, 3], **kwargs)
+	model = ResNet_Tiling(Bottleneck, [3, 4, 6, 3], **kwargs)
 	if pretrained:
 		model.load_state_dict(model_zoo.load_url(model_urls['resnet50']), strict = False)
 
