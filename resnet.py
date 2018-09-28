@@ -510,7 +510,7 @@ class ResNet_Tiling(nn.Module):
 		self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
 		self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
 		self.avgpool = nn.AvgPool2d(7, stride=1)
-		self.fc1 = nn.Linear(512 * block.expansion * 3, num_classes)
+		self.fc1 = nn.Linear(512 * block.expansion * num_res, num_classes)
 		if num_res == 3:
 			self.tiling = tile_images_FP
 			self.global_maxpool = _max_tile_3res
