@@ -51,12 +51,14 @@ num_classes = 4
 
 
 def check_accuracy(loader, model, train, cur_epoch = None, filename=None, writer = None):
-	"""evaluted model and report accuracy
+	"""evalute model and report accuracy
 
 	args:
 		loader: pytorch dataloader
 		model: pytorch module
 		train (boolean): in training mode or not
+		filename: name of result file
+		writer: tensorboard writer object for logging 
 
 	return:
 		acc: accuracy of evaluation 
@@ -248,7 +250,7 @@ def train_network(ssh = True):
 		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(test_idx), num_workers=4)
 		loaders = {'train': loader_train, 'val': loader_val}
 		### initialize model
-		model = nets.resnet50_train_tiling2(num_classes)
+		model = nets.resnet50_train_tiling(num_classes, num_res = 2)
 		print(model)
 		print()
 

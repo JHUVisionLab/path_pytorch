@@ -52,6 +52,24 @@ def tile_images_FP(images):
   
 	return torch.cat(im_list,0)
 
+def tile_image_2res(images):
+	""" Tile image in a feature pyramid like setup - 2 resolutions """
+	if images.shape[2] != 1536 or images.shape[3] != 2048:
+		raise ValueError('Image to be tiled was not 1536x2048, instead it was: '
+					 + images.shape[2] + 'x' + images.shape[3])
+
+	num_images = images.shape[0]
+	im_list = list(torch.chunk(images,num_images,0))
+	del images
+	counter=0
+	for im in im_list:
+		tiles1 = _tile_res1(im)
+		tiles2 = _tile_res2(im)
+		im_list[counter] = torch.cat([tiles1,tiles2],0)
+		counter+=1
+  
+	return torch.cat(im_list,0)
+
 def _tile_base(image):
 	#image = 1536 (H) x 2048 (W)
 	# pad = torch.stack([0,0],[0,32],[0,192],[0,0]])
@@ -126,6 +144,26 @@ def _max_tile_3res(results, num_images):
 
 	return torch.cat(list_images,0)
 
+def _max_tile_2res(results, num_images):
+		"""
+	Finds the max features for the different resolutions
+
+	Args: [num_images*(18*13+4*3),1,1,2048]
+	Returns: [num_images,1,1,4096]
+	"""
+	list_images = list(torch.chunk(results, num_images,0))
+	del results
+	counter=0
+	for im in list_images:
+		res1, res2 = torch.split(im,[12,234],0) #hardcoded
+		max1, _ = torch.max(res1, dim=0, keepdim=True)
+		max2, _ = torch.max(res2, dim=0, keepdim=True)
+		list_images[counter] = torch.cat([max1,max2,],1)
+		counter += 1
+
+	return torch.cat(list_images,0)
+
+
 def tile_res1_test(image):
 	image = F.interpolate(image, [5, 5], mode = 'bilinear')
 	channels = list(torch.chunk(image,3,1))
@@ -180,7 +218,7 @@ def tiling_test():
 	image = torch.cat([image1,image2],dim=0)
 	print()
 	pdb.set_trace()
-tiling_test()
+
 def conv3x3(in_planes, out_planes, stride=1):
 	"""3x3 convolution with padding"""
 	return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
@@ -381,11 +419,11 @@ class ResNet_2fc(nn.Module):
 
 		return x
 
-class ResNet_Tiling(nn.Module):
+class ResNet_Tiling_2fc(nn.Module):
 
-	def __init__(self, block, layers, num_classes=1000):
+	def __init__(self, block, layers, num_classes=1000, num_res=3):
 		self.inplanes = 64
-		super(ResNet_Tiling, self).__init__()
+		super(ResNet_Tiling_2fc, self).__init__()
 		self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
 							   bias=False)
 		self.bn1 = nn.BatchNorm2d(64)
@@ -396,11 +434,15 @@ class ResNet_Tiling(nn.Module):
 		self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
 		self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
 		self.avgpool = nn.AvgPool2d(7, stride=1)
-		self.fc1 = nn.Linear(512 * block.expansion * 3, 512)
+		self.fc1 = nn.Linear(512 * block.expansion * num_res, 512)
 		self.dropout = nn.Dropout(p = 0.2)
 		self.fc2 = nn.Linear(512, num_classes)
-		self.tiling = tile_images_FP
-		self.global_maxpool = _max_tile_3res
+		if num_res == 3:
+			self.tiling = tile_images_FP
+			self.global_maxpool = _max_tile_3res
+		elif num_res ==2:
+			self.tiling = tile_images_2res
+			self.global_maxpool = _max_tile_2res
 
 		for m in self.modules():
 			if isinstance(m, nn.Conv2d):
@@ -453,11 +495,11 @@ class ResNet_Tiling(nn.Module):
 
 		return x
 
-class ResNet_Tiling2(nn.Module):
+class ResNet_Tiling(nn.Module):
 
-	def __init__(self, block, layers, num_classes=1000):
+	def __init__(self, block, layers, num_classes=1000, num_res = 3):
 		self.inplanes = 64
-		super(ResNet_Tiling2, self).__init__()
+		super(ResNet_Tiling, self).__init__()
 		self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
 							   bias=False)
 		self.bn1 = nn.BatchNorm2d(64)
@@ -469,8 +511,12 @@ class ResNet_Tiling2(nn.Module):
 		self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
 		self.avgpool = nn.AvgPool2d(7, stride=1)
 		self.fc1 = nn.Linear(512 * block.expansion * 3, num_classes)
-		self.tiling = tile_images_FP
-		self.global_maxpool = _max_tile_3res
+		if num_res == 3:
+			self.tiling = tile_images_FP
+			self.global_maxpool = _max_tile_3res
+		elif num_res ==2:
+			self.tiling = tile_images_2res
+			self.global_maxpool = _max_tile_2res
 
 		for m in self.modules():
 			if isinstance(m, nn.Conv2d):
@@ -600,12 +646,12 @@ def resnet50_tiling(pretrained=False, **kwargs):
 	model.fc2.bias.requires_grad = True
 	return model
 
-def resnet50_tiling2(pretrained=False, **kwargs):
+def resnet50_tiling_2fc(pretrained=False, **kwargs):
 	"""Constructs a ResNet-50 model.
 	Args:
 		pretrained (bool): If True, returns a model pre-trained on ImageNet
 	"""
-	model = ResNet_Tiling2(Bottleneck, [3, 4, 6, 3], **kwargs)
+	model = ResNet_Tiling_2fc(Bottleneck, [3, 4, 6, 3], **kwargs)
 	if pretrained:
 		model.load_state_dict(model_zoo.load_url(model_urls['resnet50']), strict = False)
 
@@ -614,7 +660,7 @@ def resnet50_tiling2(pretrained=False, **kwargs):
 		param.requires_grad = False
 
 	# ct = 0
-	# for child in model_ft.children():
+	# for child in model.children():
 	# 	ct += 1
 	# 	if ct < 9:
  #    		for param in child.parameters():
