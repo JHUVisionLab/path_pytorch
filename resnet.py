@@ -139,7 +139,7 @@ def _max_tile_3res(results, num_images):
 		res_base, res1, res2 = torch.split(im,[1,12,234],0) #hardcoded
 		max1, _ = torch.max(res1, dim=0, keepdim=True)
 		max2, _ = torch.max(res2, dim=0, keepdim=True)
-		list_images[counter] = torch.cat([res_base,max1,max2,],1)
+		list_images[counter] = torch.cat([res_base,max1,max2],1)
 		counter += 1
 
 	return torch.cat(list_images,0)
@@ -158,7 +158,7 @@ def _max_tile_2res(results, num_images):
 		res1, res2 = torch.split(im,[12,234],0) #hardcoded
 		max1, _ = torch.max(res1, dim=0, keepdim=True)
 		max2, _ = torch.max(res2, dim=0, keepdim=True)
-		list_images[counter] = torch.cat([max1,max2,],1)
+		list_images[counter] = torch.cat([max1,max2],1)
 		counter += 1
 
 	return torch.cat(list_images,0)
