@@ -45,6 +45,38 @@ def k_folds(n_splits = 10, samples = 400):
         train_idx = np.setdiff1d(indices, test_idx)
         yield train_idx, test_idx
 
+def k_folds_2(n_splits = 10, samples = 400, num_classes = 4):
+    indices = np.arange(samples).astype(int)
+    for test_idx in get_indices_2(n_splits, samples, num_classes):
+        train_idx = np.setdiff1d(indices, test_idx)
+        yield train_idx, test_idx
+
+def get_indices_2(n_splits = 10, samples = 400, num_classes = 4):
+    subfold_sizes = int(samples/n_splits/num_classes) #400/10/4 = 10 
+    samples_per_class = int(samples/num_classes) #400/4 = 100
+    
+    indices = np.arange(samples).astype(int)
+    current = 0
+    
+    for i in range(n_splits):
+        start = current #0, 10, 20, 30, 40, 50, 60, 70, 80, 90
+        stop =  current + subfold_sizes #10, 20, 30, 40, 50, 60, 70, 80, 90, 100
+        current = stop 
+        idx = np.empty((0,)).astype(int)
+        for c in range(num_classes): #0, 1, 2, 3
+            idx = np.append(idx, indices[int(start+c*samples_per_class):int(stop+c*samples_per_class)])
+            #0:10, 100:110, 200:210, 300:310
+            #10:20, 110:120, 210:220, 310:320
+            #...
+            #90:100, 190:200, 290:300, 390:400
+        yield idx
+
+def partitions_2(samples, n_splits):
+    n_partitions = np.ones(k) * int(number/k)
+    n_partitions[0:(number % k)] += 1
+    return n_partitions
+
+
 def test_kfold(k = 10, samples = 400):
     for train_idx, test_idx in k_folds(n_splits = 10, samples = samples):
         assert np.unique(train_idx).size == samples/k*(k-1)
@@ -54,5 +86,14 @@ def test_kfold(k = 10, samples = 400):
         s = list(train_idx.intersection(test_idx))
         assert s == []
 
-test_kfold()
+def test_kfold_2(k = 10, samples = 400, num_classes = 4):
+    for train_idx, test_idx in k_folds_2(n_splits = 10, samples = samples, num_classes=num_classes):
+        assert np.unique(train_idx).size == samples/k*(k-1)
+        assert np.unique(test_idx).size == samples/k
+        train_idx = set(train_idx)
+        test_idx = set(test_idx)
+        s = list(train_idx.intersection(test_idx))
+        assert s == []
+
+test_kfold_2()
 

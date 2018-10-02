@@ -35,7 +35,7 @@ class PathologyDataset(Dataset):
 		#shuffle data
 		if shuffle:
 			np.random.shuffle(data)
-		
+			
 		img_ids = data[:,0]
 		img_classes = data[:,1]
 		img_labels = np.zeros((len(img_classes),), dtype=np.int32)

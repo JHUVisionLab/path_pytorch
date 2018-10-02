@@ -206,7 +206,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 	return acc
 
 
-def train_network(ssh = True):
+def train_network(ssh = False):
 	if ssh:
 		img_dir='/workspace/path_data/Part-A_Original'
 		results_dir = '/workspace/results_pytorch'
@@ -220,12 +220,12 @@ def train_network(ssh = True):
 	# path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', img_dir=img_dir, shuffle = True, transform=transformations.randomcrop_resize())
 	# path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', img_dir=img_dir, shuffle = False, transform=transformations.val())
 
-	path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', img_dir=img_dir, shuffle = True, transform=transformations.tiling_train())
+	path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', img_dir=img_dir, shuffle = False, transform=transformations.tiling_train())
 	path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', img_dir=img_dir, shuffle = False, transform=transformations.tiling_val())
 
 
-	path_data_val.img_ids = path_data_train.img_ids.copy()
-	path_data_val.img_labels = path_data_train.img_labels.copy()
+	# path_data_val.img_ids = path_data_train.img_ids.copy()
+	# path_data_val.img_labels = path_data_train.img_labels.copy()
 
 	# initialize acc vector for cv results 
 	acc = np.zeros((k,))
@@ -234,7 +234,7 @@ def train_network(ssh = True):
 	counter = 0
 
 	# k-fold eval
-	for train_idx, test_idx in k_folds(n_splits = k):
+	for train_idx, test_idx in k_folds_2(n_splits = k):
 		### tensor log directory
 		log_dir = os.path.join(results_dir, 'results_' + str(counter))
 		if not os.path.exists(log_dir):
