@@ -206,7 +206,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 	return acc
 
 
-def train_network(ssh = False):
+def train_network(ssh = True):
 	if ssh:
 		img_dir='/workspace/path_data/Part-A_Original'
 		results_dir = '/workspace/results_pytorch'
