@@ -79,6 +79,7 @@ def partitions_2(samples, n_splits):
 
 def test_kfold(k = 10, samples = 400):
     for train_idx, test_idx in k_folds(n_splits = 10, samples = samples):
+        print(test_idx)
         assert np.unique(train_idx).size == samples/k*(k-1)
         assert np.unique(test_idx).size == samples/k
         train_idx = set(train_idx)
@@ -88,6 +89,7 @@ def test_kfold(k = 10, samples = 400):
 
 def test_kfold_2(k = 10, samples = 400, num_classes = 4):
     for train_idx, test_idx in k_folds_2(n_splits = 10, samples = samples, num_classes=num_classes):
+        print(test_idx)
         assert np.unique(train_idx).size == samples/k*(k-1)
         assert np.unique(test_idx).size == samples/k
         train_idx = set(train_idx)

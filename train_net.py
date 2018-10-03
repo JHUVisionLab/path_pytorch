@@ -28,6 +28,7 @@ from PathologyDataset import PathologyDataset
 #### Settings 
 
 USE_GPU = True
+TILING = True
 dtype = torch.float32 # we will be using float throughout this tutorial
 
 if USE_GPU and torch.cuda.is_available():
@@ -40,14 +41,29 @@ print_every = 10
 
 print('using device:', device)
 
-NUM_TRAIN = 360
-NUM_VAL = 40
-#batch_size = 32
-batch_size = 6
-EPOCH = 100
-learning_rate = 5e-4
-k = 10
-num_classes = 4
+if TILING: 
+	NUM_TRAIN = 360
+	NUM_VAL = 40
+	batch_size = 6
+	EPOCH = 100
+	learning_rate = 5e-4
+	k = 10
+	num_classes = 4
+
+	transform_train = transformations.tiling_train()
+	transform_val = transformations.tiling_val()
+
+else: 
+	NUM_TRAIN = 360
+	NUM_VAL = 40
+	batch_size = 32
+	EPOCH = 200
+	learning_rate = 1e-3
+	k = 10
+	num_classes = 4
+
+	transform_train = transformations.randomcrop_resize()
+	transform_val = transformations.val()
 
 
 def check_accuracy(loader, model, train, cur_epoch = None, filename=None, writer = None):
@@ -133,7 +149,7 @@ def check_accuracy(loader, model, train, cur_epoch = None, filename=None, writer
 		return acc
 
 
-def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None, writer = None, decay_schedule = False):
+def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None, writer = None, decay_schedule = True):
 	writer = SummaryWriter(log_dir)
 	"""
 	Train a model on CIFAR-10 using the PyTorch Module API.
@@ -206,7 +222,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 	return acc
 
 
-def train_network(ssh = True):
+def train_network(ssh = True, optim = 'RMSprop'):
 	if ssh:
 		img_dir='/workspace/path_data/Part-A_Original'
 		results_dir = '/workspace/results_pytorch'
@@ -220,12 +236,12 @@ def train_network(ssh = True):
 	# path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', img_dir=img_dir, shuffle = True, transform=transformations.randomcrop_resize())
 	# path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', img_dir=img_dir, shuffle = False, transform=transformations.val())
 
-	path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', img_dir=img_dir, shuffle = False, transform=transformations.tiling_train())
-	path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', img_dir=img_dir, shuffle = False, transform=transformations.tiling_val())
+	path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', img_dir=img_dir, shuffle = True, transform=transform_train)
+	path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', img_dir=img_dir, shuffle = False, transform=transform_val)
 
-
-	# path_data_val.img_ids = path_data_train.img_ids.copy()
-	# path_data_val.img_labels = path_data_train.img_labels.copy()
+	if path_data_train.shuffle:
+		path_data_val.img_ids = path_data_train.img_ids.copy()
+		path_data_val.img_labels = path_data_train.img_labels.copy()
 
 	# initialize acc vector for cv results 
 	acc = np.zeros((k,))
@@ -258,9 +274,16 @@ def train_network(ssh = True):
 			print(name, p.requires_grad)
 
 		### initialize optimizer
-		#optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9)
-		optimizer = optim.RMSprop(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9, weight_decay = 0.0005, eps = 1.0)
-		
+		if optim == 'RMSprop':
+			optimizer = optim.RMSprop(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9, weight_decay = 0.0005, eps = 1.0)
+		elif optim == 'Adam':
+			optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate)
+		elif optim == 'SGD':
+			optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9)
+		else:
+			raise ValueError('Unsupported Optimizer: '
+					 + optim)
+
 		### call training/eval
 		acc[counter] = train_loop(model, loaders, optimizer, epochs=EPOCH, filename=filename, log_dir=log_dir)
 
