@@ -222,7 +222,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 	return acc
 
 
-def train_network(ssh = True, optim = 'RMSprop'):
+def train_network(ssh = True, op = 'RMSprop'):
 	if ssh:
 		img_dir='/workspace/path_data/Part-A_Original'
 		results_dir = '/workspace/results_pytorch'
@@ -274,12 +274,12 @@ def train_network(ssh = True, optim = 'RMSprop'):
 			print(name, p.requires_grad)
 
 		### initialize optimizer
-		if optim == 'RMSprop':
+		if op == 'RMSprop':
 			optimizer = optim.RMSprop(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9, weight_decay = 0.0005, eps = 1.0)
-		elif optim == 'Adam':
+		elif op == 'Adam':
 			optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate)
 		elif optim == 'SGD':
-			optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9)
+			op = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9)
 		else:
 			raise ValueError('Unsupported Optimizer: '
 					 + optim)
