@@ -44,7 +44,7 @@ print('using device:', device)
 if TILING: 
 	NUM_TRAIN = 360
 	NUM_VAL = 40
-	batch_size = 6
+	batch_size = 4
 	EPOCH = 100
 	learning_rate = 5e-4
 	k = 10
