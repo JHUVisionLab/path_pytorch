@@ -34,7 +34,7 @@ class PathologyDataset(Dataset):
 		self.shuffle = shuffle
 		#shuffle data
 		if self.shuffle:
-			for c in range(4)
+			for c in range(4):
 				np.random.shuffle(data[0 + c*100:100 + c*100, :])
 
 
