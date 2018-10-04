@@ -266,7 +266,7 @@ def train_network(ssh = True, op = 'RMSprop'):
 		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(test_idx), num_workers=4)
 		loaders = {'train': loader_train, 'val': loader_val}
 		### initialize model
-		model = nets.resnet50_train_tiling(num_classes, num_res = 3)
+		model = nets.resnet50_train_tiling(num_classes, num_res = 2)
 		print(model)
 		print()
 

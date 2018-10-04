@@ -71,12 +71,6 @@ def get_indices_2(n_splits = 10, samples = 400, num_classes = 4):
             #90:100, 190:200, 290:300, 390:400
         yield idx
 
-def partitions_2(samples, n_splits):
-    n_partitions = np.ones(k) * int(number/k)
-    n_partitions[0:(number % k)] += 1
-    return n_partitions
-
-
 def test_kfold(k = 10, samples = 400):
     for train_idx, test_idx in k_folds(n_splits = 10, samples = samples):
         print(test_idx)
