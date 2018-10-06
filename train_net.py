@@ -281,7 +281,7 @@ def train_network(ssh = True, op = 'RMSprop'):
 					 + optim)
 
 		### Scheduler
-		scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = 1, gamma = 0.5)
+		scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = int(EPOCH/4), gamma = 0.5)
 
 		### call training/eval
 		acc[counter] = train_loop(model, loaders, optimizer, epochs=EPOCH, filename=filename, log_dir=log_dir, scheduler = scheduler)
