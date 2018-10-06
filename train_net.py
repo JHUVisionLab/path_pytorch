@@ -211,7 +211,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 			optimizer.step()
 
 			if t % print_every == 0 :
-				print('Epoch %d of %d, Iteration %d, loss = %.4f' % (e+1, epochs, t+1, loss.item()))
+				print('Epoch %d of %d, Iteration %d, loss = %.4f' % (e, epochs, t, loss.item()))
 				print()
 		
 		if writer: 
@@ -287,7 +287,7 @@ def train_network(ssh = True, op = 'RMSprop'):
 					 + optim)
 
 		### Scheduler
-		scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = EPOCH/3, gamma = 0.5)
+		scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = int(EPOCH/4), gamma = 0.5)
 
 		### call training/eval
 		acc[counter] = train_loop(model, loaders, optimizer, epochs=EPOCH, filename=filename, log_dir=log_dir, scheduler = scheduler)
