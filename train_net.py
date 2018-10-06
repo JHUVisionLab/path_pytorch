@@ -231,12 +231,6 @@ def train_network(ssh = True, op = 'RMSprop'):
 	else:
 		img_dir='/Users/admin/desktop/path_pytorch/Part-A_Original'
 		results_dir = '/Users/admin/desktop/path_pytorch/results'
-	
-
-	# path_data_train and path_data_val should have different transformation (path_data_val should not apply data augmentation)
-	# therefore we shuffle path_data_train and copy its shuffled image ids and corresponding labels over to path_data_val
-	# path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', img_dir=img_dir, shuffle = True, transform=transformations.randomcrop_resize())
-	# path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', img_dir=img_dir, shuffle = False, transform=transformations.val())
 
 	path_data_train = PathologyDataset(csv_file='microscopy_ground_truth.csv', img_dir=img_dir, shuffle = True, transform=transform_train)
 	path_data_val = PathologyDataset(csv_file='microscopy_ground_truth.csv', img_dir=img_dir, shuffle = False, transform=transform_val)
@@ -287,7 +281,7 @@ def train_network(ssh = True, op = 'RMSprop'):
 					 + optim)
 
 		### Scheduler
-		scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = int(EPOCH/4), gamma = 0.5)
+		scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = 1, gamma = 0.5)
 
 		### call training/eval
 		acc[counter] = train_loop(model, loaders, optimizer, epochs=EPOCH, filename=filename, log_dir=log_dir, scheduler = scheduler)
@@ -300,10 +294,8 @@ def train_network(ssh = True, op = 'RMSprop'):
 
 
 def adjust_learning_rate(optimizer, scheduler):
-	state_dict = optimizer.state_dict()
 	scheduler.step()
-	optimizer.load_state_dict(state_dict)
-	print('current learning rate: ', state_dict['param_groups'][0]['lr'])
+	print('current learning rate: ', optimizer.state_dict()['param_groups'][0]['lr'])
 	print()
 
 
