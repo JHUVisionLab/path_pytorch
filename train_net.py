@@ -211,7 +211,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 			optimizer.step()
 
 			if t % print_every == 0 :
-				print('Epoch %d of %d, Iteration %d, loss = %.4f' % (e, epochs, t, loss.item()))
+				print('Epoch %d of %d, Iteration %d, loss = %.4f' % (e, epochs-1, t, loss.item()))
 				print()
 		
 		if writer: 
