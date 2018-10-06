@@ -149,7 +149,7 @@ def check_accuracy(loader, model, train, cur_epoch = None, filename=None, writer
 		return acc
 
 
-def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None, writer = None, decay_schedule = False, scheduler = None):
+def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None, writer = None, scheduler = None):
 	writer = SummaryWriter(log_dir)
 	"""
 	Train a model on CIFAR-10 using the PyTorch Module API.
@@ -183,7 +183,8 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 		counter = 0
 
 		# use scheduler for learning rate deacy 
-		adjust_learning_rate(optimzer, scheduler)
+		if scheduler:
+			adjust_learning_rate(optimzer, scheduler)
 
 
 		for t, (x, y) in enumerate(loader_train):
@@ -289,7 +290,7 @@ def train_network(ssh = True, op = 'RMSprop'):
 		scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = EPOCH/3, gamma = 0.5)
 
 		### call training/eval
-		acc[counter] = train_loop(model, loaders, optimizer, epochs=EPOCH, filename=filename, log_dir=log_dir)
+		acc[counter] = train_loop(model, loaders, optimizer, epochs=EPOCH, filename=filename, log_dir=log_dir, scheduler = scheduler)
 
 		### update counter
 		counter+=1
