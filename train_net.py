@@ -46,7 +46,7 @@ if TILING:
 	NUM_VAL = 40
 	batch_size = 4
 	EPOCH = 100
-	learning_rate = 5e-4
+	learning_rate = 2e-4
 	k = 10
 	num_classes = 4
 
@@ -149,7 +149,7 @@ def check_accuracy(loader, model, train, cur_epoch = None, filename=None, writer
 		return acc
 
 
-def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None, writer = None, decay_schedule = True):
+def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None, writer = None, decay_schedule = False, scheduler = None):
 	writer = SummaryWriter(log_dir)
 	"""
 	Train a model on CIFAR-10 using the PyTorch Module API.
@@ -176,15 +176,16 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 	loader_val = loaders['val']
 
 	print('training begins')
-	if decay_schedule:
-		lr = learning_rate
-		print('base learning rate: ', lr)
+	print('base learning rate: ', lr)
+
 	for e in range(epochs):
 		total_loss = 0
 		counter = 0
-		if decay_schedule and (e == int(epochs/3) or e == int(epochs*2/3)):
-			adjust_learning_rate(optimizer,lr/10)
-			lr *= 0.1
+
+		# use scheduler for learning rate deacy 
+		adjust_learning_rate(optimzer, scheduler)
+
+
 		for t, (x, y) in enumerate(loader_train):
 			counter+=1
 			model.train()  # put model to training mode
@@ -266,7 +267,7 @@ def train_network(ssh = True, op = 'RMSprop'):
 		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(test_idx), num_workers=4)
 		loaders = {'train': loader_train, 'val': loader_val}
 		### initialize model
-		model = nets.resnet50_train_tiling(num_classes, num_res = 2)
+		model = nets.resnet50_train_tiling(num_classes, num_res = 3)
 		print(model)
 		print()
 
@@ -284,6 +285,9 @@ def train_network(ssh = True, op = 'RMSprop'):
 			raise ValueError('Unsupported Optimizer: '
 					 + optim)
 
+		### Scheduler
+		scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = EPOCH/3, gamma = 0.5)
+
 		### call training/eval
 		acc[counter] = train_loop(model, loaders, optimizer, epochs=EPOCH, filename=filename, log_dir=log_dir)
 
@@ -294,13 +298,13 @@ def train_network(ssh = True, op = 'RMSprop'):
 	print('final mean accuracy: ', np.mean(acc))
 
 
-def adjust_learning_rate(optimizer, new_lr):
+def adjust_learning_rate(optimizer, scheduler):
 	state_dict = optimizer.state_dict()
-	for param_group in state_dict['param_groups']:
-		param_group['lr'] = new_lr
+	scheduler.step()
 	optimizer.load_state_dict(state_dict)
-	print('updated learning rate: ', state_dict['param_groups'][0]['lr'])
+	print('current learning rate: ', state_dict['param_groups'][0]['lr'])
 	print()
+
 
 
 def test_cv(dset1, dset2):
