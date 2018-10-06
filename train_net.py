@@ -184,7 +184,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 
 		# use scheduler for learning rate deacy 
 		if scheduler:
-			adjust_learning_rate(optimzer, scheduler)
+			adjust_learning_rate(optimizer, scheduler)
 
 
 		for t, (x, y) in enumerate(loader_train):
