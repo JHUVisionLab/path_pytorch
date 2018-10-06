@@ -164,7 +164,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 
 	# configure multi-gpu training
 	if torch.cuda.device_count() > 1:
-		print("Let's use", torch.cuda.device_count(), "GPUs!")
+		print("using", torch.cuda.device_count(), "GPUs")
 		model = nn.DataParallel(model)
 	
 	model = model.to(device=device)  # move the model parameters to GPU
@@ -176,7 +176,7 @@ def train_loop(model, loaders, optimizer, epochs=10, filename=None, log_dir=None
 	loader_val = loaders['val']
 
 	print('training begins')
-	print('base learning rate: ', lr)
+	print('base learning rate: ', learning_rate)
 
 	for e in range(epochs):
 		total_loss = 0
