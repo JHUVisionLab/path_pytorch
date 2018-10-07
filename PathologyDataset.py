@@ -31,6 +31,7 @@ class PathologyDataset(Dataset):
 		#shuffle data
 		if self.shuffle:
 			for c in range(4):
+				# enforce seeding and shuffle for each class
 				np.random.seed(seed)
 				np.random.shuffle(data[0 + c*100:100 + c*100, :])
 
