@@ -274,8 +274,8 @@ def train_network(ssh = True, op = 'SGD'):
 			optimizer = optim.RMSprop(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9, weight_decay = 0.0005, eps = 1.0)
 		elif op == 'Adam':
 			optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate)
-		elif optim == 'SGD':
-			op = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9, weight_decay = 0.0005)
+		elif op == 'SGD':
+			optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()),lr = learning_rate, momentum = 0.9, weight_decay = 0.0005)
 		else:
 			raise ValueError('Unsupported Optimizer: '
 					 + optim)
