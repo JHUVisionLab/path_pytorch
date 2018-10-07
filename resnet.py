@@ -366,7 +366,7 @@ class ResNet_Tiling(nn.Module):
 
 		x = self.avgpool(x)
 
-		if tile_after:
+		if self.tile_after:
 			pdb.set_trace()
 			x = x.view(x.size(0), -1)
 			self.fc1(x)
