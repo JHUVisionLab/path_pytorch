@@ -1,3 +1,8 @@
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import math
+
 def batch_image_normalize(images,  mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]):
 	""" Normalization of each tile instead of global image - not currently used"""
 	batchsize, h, w = images.shape[0], images.shape[2], images.shape[3]
