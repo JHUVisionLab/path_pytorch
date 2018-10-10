@@ -403,8 +403,6 @@ class ResNet_Tiling_maxpool_after(nn.Module):
 			self.tiling = H.tile_images_2res
 			self.global_maxpool = H._max_tile_2res
 
-		self.tile_after = tile_after
-
 		for m in self.modules():
 			if isinstance(m, nn.Conv2d):
 				nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
