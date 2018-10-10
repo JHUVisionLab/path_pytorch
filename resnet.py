@@ -369,7 +369,7 @@ class ResNet_Tiling(nn.Module):
 		if self.tile_after:
 			pdb.set_trace()
 			x = x.view(x.size(0), -1)
-			self.fc1(x)
+			x = self.fc1(x)
 			x = self.global_maxpool(x, num_images)
 		else: 
 			x = self.global_maxpool(x, num_images)

@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import math
 
+import pdb
+
 def batch_image_normalize(images,  mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]):
 	""" Normalization of each tile instead of global image - not currently used"""
 	batchsize, h, w = images.shape[0], images.shape[2], images.shape[3]
@@ -139,6 +141,7 @@ def _max_tile_3res(results, num_images):
 	counter=0
 	for im in list_images:
 		res_base, res1, res2 = torch.split(im,[1,12,234],0) #hardcoded
+		pdb.set_trace()
 		max1, _ = torch.max(res1, dim=0, keepdim=True)
 		max2, _ = torch.max(res2, dim=0, keepdim=True)
 		list_images[counter] = torch.cat([res_base,max1,max2],1)
