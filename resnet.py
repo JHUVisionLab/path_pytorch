@@ -398,7 +398,7 @@ class ResNet_Tiling_maxpool_after(nn.Module):
 		
 		if num_res == 3:
 			self.tiling = H.tile_images_FP
-			self.global_maxpool = H._max_tile_3res
+			self.global_maxpool = H._max_tile_global
 		elif num_res ==2:
 			self.tiling = H.tile_images_2res
 			self.global_maxpool = H._max_tile_global
