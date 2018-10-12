@@ -167,7 +167,7 @@ def _max_tile_global(results, num_images):
 	counter=0
 	for im in list_images:
 		pdb.set_trace()
-		max_logits, _ = torch.max(res1, dim=0, keepdim=True)
+		max_logits, _ = torch.max(im, dim=0, keepdim=True)
 		list_images[counter] = max_logits
 		counter += 1
 
