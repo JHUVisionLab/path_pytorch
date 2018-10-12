@@ -401,7 +401,7 @@ class ResNet_Tiling_maxpool_after(nn.Module):
 			self.global_maxpool = H._max_tile_3res
 		elif num_res ==2:
 			self.tiling = H.tile_images_2res
-			self.global_maxpool = H._max_tile_2res
+			self.global_maxpool = H._max_tile_global
 
 		for m in self.modules():
 			if isinstance(m, nn.Conv2d):
@@ -446,7 +446,6 @@ class ResNet_Tiling_maxpool_after(nn.Module):
 
 		x = self.avgpool(x)
 
-		pdb.set_trace()
 		x = x.view(x.size(0), -1)
 		x = self.fc1(x)
 		x = self.global_maxpool(x, num_images)

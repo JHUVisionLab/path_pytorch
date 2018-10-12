@@ -149,6 +149,31 @@ def _max_tile_3res(results, num_images):
 
 	return torch.cat(list_images,0)
 
+def _max_tile_global(results, num_images):
+	"""
+	Finds the max features for the different resolutions
+
+	Args: 
+		[num_images*(18*13+4*3+1),1,1,2048] if pooling before fc classification 
+		[num_images*(18*13+4*3+1),1,1,4)] if pooling after fc classification 
+	
+	Returns: 
+		[num_images,1,1,6144] if pooling before fc classification
+		[num_images,4] if pooling after fc classification 
+
+	"""
+	list_images = list(torch.chunk(results, num_images,0))
+	del results
+	counter=0
+	for im in list_images:
+		pdb.set_trace()
+		max_logits, _ = torch.max(res1, dim=0, keepdim=True)
+		list_images[counter] = max_logits
+		counter += 1
+
+	pdb.set_trace()
+	return torch.cat(list_images,0)
+
 def _max_tile_2res(results, num_images):
 	"""
 	Finds the max features for the different resolutions
