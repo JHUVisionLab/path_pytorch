@@ -75,10 +75,11 @@ def tile_images(images, res):
 	del images
 	counter=0
 	for im in im_list:
-		for i in res:
-		# tiles = [eval(f_dict[str(i)]) for i in res]
-			tiles = eval(f_dict[str(i)])
-		im_list[counter] = torch.cat(tiles,0)
+		tiles = [torch.cat(eval(f_dict[str(i)]),0) for i in res]
+
+		# for i in res:
+		# 	tiles = eval(f_dict[str(i)])
+		# im_list[counter] = torch.cat(tiles,0)
 		counter+=1
   
 	return torch.cat(im_list,0)
