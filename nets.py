@@ -68,8 +68,8 @@ def resnet50_train(num_classes):
   model = resnet50_fc(pretrained=True, num_classes = 4)
   return model
 
-def resnet50_train_tiling(num_classes=4, num_res = 3, pool_after = False):
-  model = resnet50_tiling_1fc(pretrained=True, pool_after = pool_after, num_classes = 4, num_res = num_res)
+def resnet50_train_tiling(num_classes=4, res = [0,1,2], pool_after = False):
+  model = resnet50_tiling_1fc(pretrained=True, pool_after = pool_after, num_classes = 4, res = res)
   return model
 
 def resnet50_train_tiling2(num_classes=4, num_res = 3, tile_after = True):

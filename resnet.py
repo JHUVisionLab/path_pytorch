@@ -297,10 +297,91 @@ class ResNet_Tiling_2fc(nn.Module):
 
 		return x
 
+# class ResNet_Tiling(nn.Module):
+# 	### ResNet with Tiling and 1 fc layer
+
+# 	def __init__(self, block, layers, num_classes=1000, num_res = 3, tile_after = False):
+# 		self.inplanes = 64
+# 		super(ResNet_Tiling, self).__init__()
+# 		self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
+# 							   bias=False)
+# 		self.bn1 = nn.BatchNorm2d(64)
+# 		self.relu = nn.ReLU(inplace=True)
+# 		self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+# 		self.layer1 = self._make_layer(block, 64, layers[0])
+# 		self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
+# 		self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
+# 		self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
+# 		self.avgpool = nn.AvgPool2d(7, stride=1)
+# 		self.fc1 = nn.Linear(512 * block.expansion * num_res, num_classes)
+# 		if num_res == 3:
+# 			self.tiling = H.tile_images_FP
+# 			self.global_maxpool = H._max_tile_3res
+# 		elif num_res ==2:
+# 			self.tiling = H.tile_images_2res
+# 			self.global_maxpool = H._max_tile_2res
+
+# 		self.tile_after = tile_after
+
+# 		for m in self.modules():
+# 			if isinstance(m, nn.Conv2d):
+# 				nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+# 			elif isinstance(m, nn.BatchNorm2d):
+# 				nn.init.constant_(m.weight, 1)
+# 				nn.init.constant_(m.bias, 0)
+# 			elif isinstance(m, nn.Linear):
+# 				nn.init.normal_(m.weight, std=0.01)
+# 				nn.init.constant_(m.bias, 0)
+
+# 	def _make_layer(self, block, planes, blocks, stride=1):
+# 		downsample = None
+# 		if stride != 1 or self.inplanes != planes * block.expansion:
+# 			downsample = nn.Sequential(
+# 				nn.Conv2d(self.inplanes, planes * block.expansion,
+# 						  kernel_size=1, stride=stride, bias=False),
+# 				nn.BatchNorm2d(planes * block.expansion),
+# 			)
+
+# 		layers = []
+# 		layers.append(block(self.inplanes, planes, stride, downsample))
+# 		self.inplanes = planes * block.expansion
+# 		for i in range(1, blocks):
+# 			layers.append(block(self.inplanes, planes))
+
+# 		return nn.Sequential(*layers)
+
+# 	def forward(self, x):
+# 		num_images = x.shape[0]
+# 		x = self.tiling(x)
+# 		# x = batch_image_normalize(x, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+# 		x = self.conv1(x)
+# 		x = self.bn1(x)
+# 		x = self.relu(x)
+# 		x = self.maxpool(x)
+
+# 		x = self.layer1(x)
+# 		x = self.layer2(x)
+# 		x = self.layer3(x)
+# 		x = self.layer4(x)
+
+# 		x = self.avgpool(x)
+
+# 		if self.tile_after:
+# 			pdb.set_trace()
+# 			x = x.view(x.size(0), -1)
+# 			x = self.fc1(x)
+# 			x = self.global_maxpool(x, num_images)
+# 		else: 
+# 			x = self.global_maxpool(x, num_images)
+# 			x = x.view(x.size(0), -1)
+# 			x = self.fc1(x)
+		
+# 		return x
+
 class ResNet_Tiling(nn.Module):
 	### ResNet with Tiling and 1 fc layer
 
-	def __init__(self, block, layers, num_classes=1000, num_res = 3, tile_after = False):
+	def __init__(self, block, layers, num_classes=1000, res = [0,1,2]):
 		self.inplanes = 64
 		super(ResNet_Tiling, self).__init__()
 		self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
@@ -313,15 +394,10 @@ class ResNet_Tiling(nn.Module):
 		self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
 		self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
 		self.avgpool = nn.AvgPool2d(7, stride=1)
-		self.fc1 = nn.Linear(512 * block.expansion * num_res, num_classes)
-		if num_res == 3:
-			self.tiling = H.tile_images_FP
-			self.global_maxpool = H._max_tile_3res
-		elif num_res ==2:
-			self.tiling = H.tile_images_2res
-			self.global_maxpool = H._max_tile_2res
-
-		self.tile_after = tile_after
+		self.fc1 = nn.Linear(512 * block.expansion * len(res), num_classes)
+		self.res = res
+		self.global_maxpool = H.max_tile
+		self.tiling = H.tile_images
 
 		for m in self.modules():
 			if isinstance(m, nn.Conv2d):
@@ -352,7 +428,7 @@ class ResNet_Tiling(nn.Module):
 
 	def forward(self, x):
 		num_images = x.shape[0]
-		x = self.tiling(x)
+		x = self.tiling(x, self.res)
 		# x = batch_image_normalize(x, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 		x = self.conv1(x)
 		x = self.bn1(x)
@@ -366,17 +442,13 @@ class ResNet_Tiling(nn.Module):
 
 		x = self.avgpool(x)
 
-		if self.tile_after:
-			pdb.set_trace()
-			x = x.view(x.size(0), -1)
-			x = self.fc1(x)
-			x = self.global_maxpool(x, num_images)
-		else: 
-			x = self.global_maxpool(x, num_images)
-			x = x.view(x.size(0), -1)
-			x = self.fc1(x)
+		x = self.global_maxpool(x, num_images, self.res)
+		x = x.view(x.size(0), -1)
+		x = self.fc1(x)
 		
 		return x
+
+
 
 class ResNet_Tiling_maxpool_after(nn.Module):
 	### ResNet with Tiling and 1 fc layer

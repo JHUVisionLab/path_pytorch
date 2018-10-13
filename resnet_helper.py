@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math
+import numpy as np
 
 import pdb
 
@@ -55,6 +56,27 @@ def tile_images_2res(images):
 		tiles1 = _tile_res1(im)
 		tiles2 = _tile_res2(im)
 		im_list[counter] = torch.cat([tiles1,tiles2],0)
+		counter+=1
+  
+	return torch.cat(im_list,0)
+
+def tile_images(images, res):
+	""" Tile image in a feature pyramid like setup - 2 resolutions """
+	if images.shape[2] != 1536 or images.shape[3] != 2048:
+		raise ValueError('Image to be tiled was not 1536x2048, instead it was: '
+					 + images.shape[2] + 'x' + images.shape[3])
+
+	pdb.set_trace()
+	num_images = images.shape[0]
+	im_list = list(torch.chunk(images,num_images,0))
+
+	f_dict = {'0': '_tile_base(im)', '1': '_tile_res1(im)', '2': '_tile_res2(im)' }
+
+	del images
+	counter=0
+	for im in im_list:
+		tiles = [eval(f_dict[str(res[i])]) for i in res]
+		im_list[counter] = torch.cat(tiles,0)
 		counter+=1
   
 	return torch.cat(im_list,0)
@@ -123,6 +145,8 @@ def _tile_res2(image):
 
 	return torch.cat(channels,1)
 
+
+
 def _max_tile_3res(results, num_images):
 	"""
 	Finds the max features for the different resolutions
@@ -141,7 +165,6 @@ def _max_tile_3res(results, num_images):
 	counter=0
 	for im in list_images:
 		res_base, res1, res2 = torch.split(im,[1,12,234],0) #hardcoded
-		pdb.set_trace()
 		max1, _ = torch.max(res1, dim=0, keepdim=True)
 		max2, _ = torch.max(res2, dim=0, keepdim=True)
 		list_images[counter] = torch.cat([res_base,max1,max2],1)
@@ -172,6 +195,66 @@ def _max_tile_global(results, num_images):
 	
 	return torch.cat(list_images,0)
 
+
+def _max_tile_global_avg(results, num_images, res):
+	"""
+	Finds the max features for the different resolutions
+
+	Args: 
+		[num_images*(18*13+4*3+1),1,1,4)] if pooling after fc classification 
+	
+	Returns: 
+		[num_images,num_res*4] if pooling after fc classification 
+
+	"""
+	res_size = [1, 12, 234]
+	chunks = [res_size[i] for i in res]
+	list_images = list(torch.chunk(results, num_images,0))
+	del results
+	counter=0
+
+	for im in list_images:
+		tiles = list(torch.split(im,chunks,0))
+		for r in range(len(tiles)):
+			tiles[r] = torch.max(tiles[r], dim=0, keepdim=True)
+
+		list_images[counter] = torch.cat(tiles, 0)
+		counter += 1
+	
+	return torch.cat(list_images,0)
+
+def max_tile(results, num_images, res):
+	"""
+	Finds the max features for the different resolutions
+
+	Args: 
+		results: tile features, [num_images*(18*13+4*3),1,1,2048]
+		num_images: number of images in the minibatch
+		res: list of resolutions used in tiling, 0 is coarse (1 tile), 1 is medium (12 tiles), 2 is fine (234 tiles)
+	
+	Returns: 
+		[num_images,1,1,len(res)*2048]
+	"""
+	pdb.set_trace()
+	if len(res) > 3:
+		raise ValueError('Chose more than 3 resolutions.')
+
+	res_size = [1, 12, 234]
+	chunks = [res_size[i] for i in res]
+	list_images = list(torch.chunk(results, num_images,0))
+	del results
+	counter=0
+	for im in list_images:
+		tiles = list(torch.split(im,chunks,0))
+		# for r in range(len(tiles)):
+		# 	tiles[r] = torch.max(tiles[r], dim=0, keepdim=True)
+		tiles = [torch.max(tiles[r], dim=0, keepdim=True) for r in tiles]
+		
+		list_images[counter] = torch.cat(tiles,1)
+		counter += 1
+
+	return torch.cat(list_images,0)
+
 def _max_tile_2res(results, num_images):
 	"""
 	Finds the max features for the different resolutions
@@ -190,7 +273,6 @@ def _max_tile_2res(results, num_images):
 		counter += 1
 
 	return torch.cat(list_images,0)
-
 
 def tile_res1_test(image):
 	image = F.interpolate(image, [5, 5], mode = 'bilinear')
@@ -220,6 +302,7 @@ def tile_res2_test(image):
 		counter+=1
 
 	return torch.cat(channels,1)
+
 def tiling_test():
 	import numpy as np
 	images = np.arange(600,dtype=np.float64).reshape((2,3,10,10))
