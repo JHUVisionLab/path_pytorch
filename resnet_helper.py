@@ -259,7 +259,7 @@ def max_tile(results, num_images, res):
 		tiles = list(torch.split(im,chunks,0))
 		# for r in range(len(tiles)):
 		# 	tiles[r] = torch.max(tiles[r], dim=0, keepdim=True)
-		tiles = [torch.max(tiles[r], dim=0, keepdim=True) for r in tiles]
+		tiles = [torch.max(r, dim=0, keepdim=True) for r in tiles]
 		
 		list_images[counter] = torch.cat(tiles,1)
 		counter += 1
