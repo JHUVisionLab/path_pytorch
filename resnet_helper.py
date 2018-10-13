@@ -65,8 +65,7 @@ def tile_images(images, res):
 	if images.shape[2] != 1536 or images.shape[3] != 2048:
 		raise ValueError('Image to be tiled was not 1536x2048, instead it was: '
 					 + images.shape[2] + 'x' + images.shape[3])
-
-	pdb.set_trace()
+		
 	num_images = images.shape[0]
 	im_list = list(torch.chunk(images,num_images,0))
 
@@ -246,7 +245,6 @@ def max_tile(results, num_images, res):
 	Returns: 
 		[num_images,1,1,len(res)*2048]
 	"""
-	pdb.set_trace()
 	if len(res) > 3:
 		raise ValueError('Chose more than 3 resolutions.')
 
@@ -257,8 +255,6 @@ def max_tile(results, num_images, res):
 	counter=0
 	for im in list_images:
 		tiles = list(torch.split(im,chunks,0))
-		# for r in range(len(tiles)):
-		# 	tiles[r] = torch.max(tiles[r], dim=0, keepdim=True)
 		tiles = [torch.max(r, dim=0, keepdim=True)[0] for r in tiles]
 		
 		list_images[counter] = torch.cat(tiles,1)
