@@ -262,7 +262,7 @@ def train_network(ssh = True, op = 'SGD'):
 		loader_val = torch.utils.data.DataLoader(dataset = path_data_val, batch_size = batch_size, sampler = sampler.SubsetRandomSampler(test_idx), num_workers=4)
 		loaders = {'train': loader_train, 'val': loader_val}
 		### initialize model
-		model = nets.resnet50_train_tiling(num_classes, res = [0,1], pool_after = False)
+		model = nets.resnet50_train_tiling(num_classes, res = [0,2], pool_after = False)
 		print(model)
 		print()
 
