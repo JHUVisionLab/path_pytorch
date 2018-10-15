@@ -1,1 +1,1 @@
-# Pytorch Implementation of Multi-resolution Tiling Approach to Digital Pathology Classification 
+# Pytorch Implementation of Multi-res Tiling Approach to Digital Pathology Classification 
