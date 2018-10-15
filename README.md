@@ -13,4 +13,4 @@
 
 **resnet_helper.py**: helper functions for tiling
 
-**PathologyDataset.py**: dataset module 
+**PathologyDataset.py**: pathology dataset module 
